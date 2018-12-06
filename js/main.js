@@ -190,7 +190,7 @@ var getPicture = function (picture) {
 };
 
 
-// Удаление комментариев
+// Удаление дефолтных комментариев из разметки
 var removeComment = function () {
   while (commentsList.firstChild) {
     commentsList.removeChild(commentsList.firstChild);
@@ -198,7 +198,7 @@ var removeComment = function () {
 };
 
 
-// Создание комментария
+// Создание комментария. Нужно перписать, потому что теперь комментарий — это объект, а не строка
 var createComment = function (comment) {
   var commentItem = makeElement('li', 'social__comment');
   var avatar = makeElement('img', 'social__picture');
@@ -215,7 +215,7 @@ var createComment = function (comment) {
 };
 
 
-// Добавление комментария
+// Добавление комментария в разметку
 var addComments = function (picture) {
   var fragment = document.createDocumentFragment();
 
@@ -298,13 +298,20 @@ var onImgUploadCloseEscKeydown = function (evt) {
 };
 
 
+// Сброс уровня эффекта
+var resetEffectLevel = function () {
+  effectLevelDepth.setAttribute('style', 'width:100%');
+  effectLevelPin.setAttribute('style', 'left:100%');
+  effectLevelValue.setAttribute('value', '100');
+};
+
+
 // Открытие формы редактирования изображения
 var openImgUpload = function () {
   imgUpload.classList.remove('hidden');
   effectLevel.classList.add('hidden');
-  effectLevelDepth.setAttribute('style', 'width:100%');
-  effectLevelPin.setAttribute('style', 'left:100%');
-  effectLevelValue.setAttribute('value', '100');
+  resetEffectLevel();
+  scaleControlValue.setAttribute('value', '100%'); // Делаем значение поля по умолчанию 100% (ТЗ 2.1)
 };
 
 
@@ -315,22 +322,27 @@ var addEffects = function () {
     effectLevel.classList.add('hidden');
   } else if (effectChrome.checked) {
     imgPreview.className = '';
+    resetEffectLevel();
     effectLevel.classList.remove('hidden');
     imgPreview.classList.add('effects__preview--chrome');
   } else if (effectSepia.checked) {
     imgPreview.className = '';
+    resetEffectLevel();
     effectLevel.classList.remove('hidden');
     imgPreview.classList.add('effects__preview--sepia');
   } else if (effectMarvin.checked) {
     imgPreview.className = '';
+    resetEffectLevel();
     effectLevel.classList.remove('hidden');
     imgPreview.classList.add('effects__preview--marvin');
   } else if (effectPhobos.checked) {
     imgPreview.className = '';
+    resetEffectLevel();
     effectLevel.classList.remove('hidden');
     imgPreview.classList.add('effects__preview--phobos');
   } else if (effectHeat.checked) {
     imgPreview.className = '';
+    resetEffectLevel();
     effectLevel.classList.remove('hidden');
     imgPreview.classList.add('effects__preview--heat');
   }
@@ -339,7 +351,7 @@ var addEffects = function () {
 
 // Что происходит при перетаскивании
 var movePin = function () {
-  var level = parseInt(effectLevelPin.getAttribute('left'));
+  var level = parseInt(effectLevelPin.getAttribute('left'), 10);
   effectLevelValue.setAttribute('value', level);
   var filterValue = level / 100;
 
@@ -361,13 +373,13 @@ var movePin = function () {
 
 // Уменьшаем фоточку
 var scaleSmaller = function () {
-  var value = parseInt(scaleControlValue.value);
+  var value = parseInt(scaleControlValue.value, 10);
 
   if (value > 25) {
     value -= 25;
     imgPreview.setAttribute('style', 'transform:scale(0.' + value + ')');
     scaleControlValue.value = value + '%';
-  } else if (value === 25) {
+  } else if (value <= 25) {
     imgPreview.setAttribute('style', 'transform:scale(0.25)');
     scaleControlValue.value = value + '%';
   }
@@ -376,7 +388,7 @@ var scaleSmaller = function () {
 
 // Увеличиваем фоточку
 var scaleBigger = function () {
-  var value = parseInt(scaleControlValue.value);
+  var value = parseInt(scaleControlValue.value, 10);
 
   if (value < 75) {
     value += 25;
