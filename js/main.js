@@ -21,6 +21,10 @@ var DESCRIPTIONS = [
   'Вот это тачка!'
 ];
 
+var NAMES = [
+  'Peter'
+];
+
 var Keycode = {
   ESC: 27,
   ENTER: 13
@@ -156,20 +160,38 @@ var searchDuplicate = function (elem, arr) {
 };
 
 
+// Создаём массив объектов, описывающих комментарии
+var createCommentsArray = function () {
+  var commentsNumber = getRandomNumber(1, 10);
+  var comments = [];
+
+  for (var i = 0; i < commentsNumber; i++) {
+    comments[i] = {
+      avatar: 'img/avatar-' + getRandomNumber(1, 6) + '.svg',
+      message: SENTENCES[getRandomNumber(0, SENTENCES.length - 1)],
+      name: NAMES[getRandomNumber(0, NAMES.length - 1)]
+    };
+  }
+
+  return comments;
+};
+
+
 /* Основные функции
    ========================================================================== */
 
 // Создание массива фоточек
 var createPictures = function () {
   var pictures = [];
-  var comments = createTextArray(SENTENCES, PICTURES_NUMBER);
+  // var comments = createTextArray(SENTENCES, PICTURES_NUMBER);
   var descriptions = createTextArray(DESCRIPTIONS, PICTURES_NUMBER);
 
   for (var i = 0; i < PICTURES_NUMBER; i++) {
     pictures[i] = {
       url: 'photos/' + (i + 1) + '.jpg',
       likes: getRandomNumber(15, 200),
-      comments: comments,
+      // comments: comments,
+      comments: createCommentsArray(),
       description: descriptions[i]
     };
   }
@@ -198,18 +220,18 @@ var removeComment = function () {
 };
 
 
-// Создание комментария. Нужно перписать, потому что теперь комментарий — это объект, а не строка
+// Создание комментария
 var createComment = function (comment) {
   var commentItem = makeElement('li', 'social__comment');
   var avatar = makeElement('img', 'social__picture');
 
-  avatar.src = 'img/avatar-' + getRandomNumber(1, 6) + '.svg';
-  avatar.alt = 'Аватар комментатора фотографии';
+  avatar.src = comment.avatar;
+  avatar.alt = comment.name;
   avatar.width = AVATAR_SIZE;
   avatar.height = AVATAR_SIZE;
 
   commentItem.appendChild(avatar);
-  commentItem.appendChild(document.createTextNode(comment));
+  commentItem.appendChild(document.createTextNode(comment.message));
 
   return commentItem;
 };
