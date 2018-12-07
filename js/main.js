@@ -47,6 +47,7 @@ var fileUpload = document.querySelector('#upload-file');
 var imgUpload = document.querySelector('.img-upload__overlay');
 var uploadCancel = document.querySelector('#upload-cancel');
 var effectLevel = document.querySelector('.effect-level');
+var effectLeveline = document.querySelector('.effect-level__line');
 var effectLevelPin = document.querySelector('.effect-level__pin');
 var effectLevelDepth = document.querySelector('.effect-level__depth');
 var effectLevelValue = document.querySelector('.effect-level__value');
@@ -70,13 +71,13 @@ var uploadSubmit = document.querySelector('#upload-submit');
 /* Вспомогательные функции
    ========================================================================== */
 
-// Получение случайного числа
+// Получаем случайного числа
 var getRandomNumber = function (min, max) {
   return Math.round(Math.random() * (max - min) + min);
 };
 
 
-// Перестановка двух элементов в массиве
+// Меняем местами два элемента в массиве
 var swapElements = function (array, index1, index2) {
   var temporaryValue = array[index1];
   array[index1] = array[index2];
@@ -84,7 +85,7 @@ var swapElements = function (array, index1, index2) {
 };
 
 
-// Копирование массива
+// Копируем массива
 var copyArray = function (array) {
   var newArray = [];
 
@@ -96,7 +97,7 @@ var copyArray = function (array) {
 };
 
 
-// Создание массива нужной длины
+// Создаём массива нужной длины
 var createArray = function (array, length) {
   var newArray = [];
 
@@ -109,7 +110,7 @@ var createArray = function (array, length) {
 };
 
 
-// Перемешивание массива
+// Перемешиваем массив
 var shuffleArray = function (array) {
   for (var i = 0; i < array.length; i++) {
     var randomIndex = getRandomNumber(0, array.length - 1);
@@ -120,7 +121,7 @@ var shuffleArray = function (array) {
 };
 
 
-// Потенциально универсальная функция для создания массива комментов или описаний
+// Создаём массив комментов или описаний
 var createTextArray = function (array, length) {
   var newArray = [];
   var text = createArray(copyArray(array), length);
@@ -133,7 +134,7 @@ var createTextArray = function (array, length) {
 };
 
 
-// Создание какого-нибудь элемента
+// Создаём какой-нибудь элемент
 var makeElement = function (tagName, className, text) {
   var element = document.createElement(tagName);
   element.classList.add(className);
@@ -180,17 +181,15 @@ var createCommentsArray = function () {
 /* Основные функции
    ========================================================================== */
 
-// Создание массива фоточек
+// Создаём массив фоточек
 var createPictures = function () {
   var pictures = [];
-  // var comments = createTextArray(SENTENCES, PICTURES_NUMBER);
   var descriptions = createTextArray(DESCRIPTIONS, PICTURES_NUMBER);
 
   for (var i = 0; i < PICTURES_NUMBER; i++) {
     pictures[i] = {
       url: 'photos/' + (i + 1) + '.jpg',
       likes: getRandomNumber(15, 200),
-      // comments: comments,
       comments: createCommentsArray(),
       description: descriptions[i]
     };
@@ -200,7 +199,7 @@ var createPictures = function () {
 };
 
 
-// Создание болванки для превьюшки
+// Создаём болванку для превьюшки
 var getPicture = function (picture) {
   var pictureElement = pictureTemplate.cloneNode(true);
 
@@ -212,7 +211,7 @@ var getPicture = function (picture) {
 };
 
 
-// Удаление дефолтных комментариев из разметки
+// Удаляем дефолтные комментарии из разметки
 var removeComment = function () {
   while (commentsList.firstChild) {
     commentsList.removeChild(commentsList.firstChild);
@@ -220,7 +219,7 @@ var removeComment = function () {
 };
 
 
-// Создание комментария
+// Создаём комментарий
 var createComment = function (comment) {
   var commentItem = makeElement('li', 'social__comment');
   var avatar = makeElement('img', 'social__picture');
@@ -237,7 +236,7 @@ var createComment = function (comment) {
 };
 
 
-// Добавление комментария в разметку
+// Добавляем комментарий в разметку
 var addComments = function (picture) {
   var fragment = document.createDocumentFragment();
 
@@ -250,7 +249,7 @@ var addComments = function (picture) {
 };
 
 
-// Заполнение и показ большой фоточки
+// Заполняем и показываем большую фоточку
 var fillOverlay = function (picture) {
   bigPictureImg.src = picture.url;
   likesCount.textContent = picture.likes;
@@ -267,7 +266,7 @@ var fillOverlay = function (picture) {
 };
 
 
-// Отрисовывание фоточек
+// Отрисовываем фоточки
 var renderPictures = function (array) {
   var fragment = document.createDocumentFragment();
 
@@ -287,13 +286,13 @@ var renderPictures = function (array) {
 };
 
 
-// Закрытие большой фоточки
+// Закрываем большую фоточку
 var closeBigPicture = function () {
   bigPicture.classList.add('hidden');
 };
 
 
-// Закрытие большой фоточки эскейпом
+// Закрываем большую фоточку эскейпом
 var onBigPictureCloseEscKeydown = function (evt) {
   if (evt.keyCode === Keycode.ESC) {
     closeBigPicture();
@@ -301,7 +300,7 @@ var onBigPictureCloseEscKeydown = function (evt) {
 };
 
 
-// Закрытие формы редактирования изображения
+// Закрываем форму редактирования изображения
 var closeImgUpload = function () {
   var focused = document.activeElement;
 
@@ -312,7 +311,7 @@ var closeImgUpload = function () {
 };
 
 
-// Закрытие формы редактирования изображения эскейпом
+// Закрываем форму редактирования изображения эскейпом
 var onImgUploadCloseEscKeydown = function (evt) {
   if (evt.keyCode === Keycode.ESC) {
     closeImgUpload();
@@ -320,19 +319,22 @@ var onImgUploadCloseEscKeydown = function (evt) {
 };
 
 
-// Сброс уровня эффекта
-var resetEffectLevel = function () {
+// Сбрасываем эффект
+var resetEffect = function () {
+  imgPreview.style = '';
+  imgPreview.className = '';
+
   effectLevelDepth.setAttribute('style', 'width:100%');
   effectLevelPin.setAttribute('style', 'left:100%');
   effectLevelValue.setAttribute('value', '100');
 };
 
 
-// Открытие формы редактирования изображения
+// Открываем форму редактирования изображения
 var openImgUpload = function () {
   imgUpload.classList.remove('hidden');
   effectLevel.classList.add('hidden');
-  resetEffectLevel();
+  resetEffect();
   scaleControlValue.setAttribute('value', '100%'); // Делаем значение поля по умолчанию 100% (ТЗ 2.1)
 };
 
@@ -343,52 +345,25 @@ var addEffects = function () {
     imgPreview.className = '';
     effectLevel.classList.add('hidden');
   } else if (effectChrome.checked) {
-    imgPreview.className = '';
-    resetEffectLevel();
+    resetEffect();
     effectLevel.classList.remove('hidden');
     imgPreview.classList.add('effects__preview--chrome');
   } else if (effectSepia.checked) {
-    imgPreview.className = '';
-    resetEffectLevel();
+    resetEffect();
     effectLevel.classList.remove('hidden');
     imgPreview.classList.add('effects__preview--sepia');
   } else if (effectMarvin.checked) {
-    imgPreview.className = '';
-    resetEffectLevel();
+    resetEffect();
     effectLevel.classList.remove('hidden');
     imgPreview.classList.add('effects__preview--marvin');
   } else if (effectPhobos.checked) {
-    imgPreview.className = '';
-    resetEffectLevel();
+    resetEffect();
     effectLevel.classList.remove('hidden');
     imgPreview.classList.add('effects__preview--phobos');
   } else if (effectHeat.checked) {
-    imgPreview.className = '';
-    resetEffectLevel();
+    resetEffect();
     effectLevel.classList.remove('hidden');
     imgPreview.classList.add('effects__preview--heat');
-  }
-};
-
-
-// Что происходит при перетаскивании
-var movePin = function () {
-  var level = parseInt(effectLevelPin.getAttribute('left'), 10);
-  effectLevelValue.setAttribute('value', level);
-  var filterValue = level / 100;
-
-  if (effectChrome.checked) {
-    imgPreview.setAttribute('style', 'filter:grayscale(' + filterValue + ')');
-  } else if (effectSepia.checked) {
-    imgPreview.setAttribute('style', 'filter:sepia(' + filterValue + ')');
-  } else if (effectMarvin.checked) {
-    imgPreview.setAttribute('style', 'filter:invert(' + level + '%)');
-  } else if (effectPhobos.checked) {
-    filterValue = level * 5 / 100;
-    imgPreview.setAttribute('style', 'filter:blur(' + filterValue + 'px)');
-  } else if (effectHeat.checked) {
-    filterValue = level * 3 / 100;
-    imgPreview.setAttribute('style', 'filter:brightness(' + filterValue + ')');
   }
 };
 
@@ -453,12 +428,14 @@ var validateHasgtags = function () {
 };
 
 
-// Отрисовка фоточек
+// Отрисовываем фоточки
 var pictures = createPictures();
 renderPictures(pictures);
 
 
-// Пошли обработчики
+/* Здесь начинаются обработчики
+   ========================================================================== */
+
 bigPictureClose.addEventListener('click', function () {
   closeBigPicture();
 });
@@ -503,24 +480,32 @@ textHashtags.addEventListener('input', function () {
   textHashtags.setCustomValidity('');
 });
 
+// Двигаем пин
 effectLevelPin.addEventListener('mousedown', function (evt) {
   evt.preventDefault();
 
-  // var dragged = false;
+  var maxLeftCoords = effectLeveline.offsetWidth;
+  var minLeftCoords = 0;
 
   var startCoords = {
     x: evt.clientX,
     y: evt.clientY
   };
 
-  // var limits = {
-  //   top:
-  //   bottom:
-  //   right:
-  //   left:
-  // };
+  // Ограничиваем перемещение пина
+  var checkLimits = function (shift) {
+    if (effectLevelPin.offsetLeft > maxLeftCoords) {
+      effectLevelPin.style.left = maxLeftCoords + 'px';
+      effectLevelDepth.setAttribute('style', 'width:0');
+    } else if (effectLevelPin.offsetLeft < minLeftCoords) {
+      effectLevelPin.style.left = minLeftCoords + 'px';
+    } else {
+      effectLevelPin.style.left = (effectLevelPin.offsetLeft - shift.x) + 'px';
+      effectLevelDepth.setAttribute('style', 'width:' + effectLevelPin.style.left);
+    }
+  };
 
-  var onMouseMove = function (moveEvt) {
+  var onPinMouseMove = function (moveEvt) {
     moveEvt.preventDefault();
 
     var shift = {
@@ -533,22 +518,37 @@ effectLevelPin.addEventListener('mousedown', function (evt) {
       y: moveEvt.clientY
     };
 
-    effectLevelPin.style.left = (effectLevelPin.offsetLeft - shift.x) + 'px';
+    checkLimits(shift);
+
+    // Меняем глубину эффекта при перемещнии пина
+    var level = Math.floor((effectLevelPin.offsetLeft - shift.x) / maxLeftCoords * 100);
+    effectLevelValue.setAttribute('value', level);
+    var filterValue = level / 100;
+
+    if (effectChrome.checked) {
+      imgPreview.setAttribute('style', 'filter:grayscale(' + filterValue + ')');
+    } else if (effectSepia.checked) {
+      imgPreview.setAttribute('style', 'filter:sepia(' + filterValue + ')');
+    } else if (effectMarvin.checked) {
+      imgPreview.setAttribute('style', 'filter:invert(' + level + '%)');
+    } else if (effectPhobos.checked) {
+      filterValue = level * 5 / 100;
+      imgPreview.setAttribute('style', 'filter:blur(' + filterValue + 'px)');
+    } else if (effectHeat.checked) {
+      filterValue = level * 3 / 100;
+      imgPreview.setAttribute('style', 'filter:brightness(' + filterValue + ')');
+    }
   };
 
-  var onMouseUp = function (upEvt) {
+  var onPinMouseUp = function (upEvt) {
     upEvt.preventDefault();
 
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup', onMouseUp);
+    document.removeEventListener('mousemove', onPinMouseMove);
+    document.removeEventListener('mouseup', onPinMouseUp);
   };
 
-  document.addEventListener('mousemove', onMouseMove);
-  document.addEventListener('mouseup', onMouseUp);
-});
-
-effectLevelPin.addEventListener('mouseup', function () {
-  movePin();
+  document.addEventListener('mousemove', onPinMouseMove);
+  document.addEventListener('mouseup', onPinMouseUp);
 });
 
 
