@@ -4,6 +4,8 @@ var PICTURES_NUMBER = 25;
 var AVATAR_SIZE = '35';
 var PICTURES_FOLDER = 'photos/';
 var PICTURES_FORMAT = '.jpg';
+var AVATARS_FOLDER = 'img/avatar-';
+var AVATARS_FORMAT = '.svg';
 
 var SENTENCES = [
   'Всё отлично!',
@@ -56,12 +58,13 @@ var effectLevelValue = effectLevel.querySelector('.effect-level__value');
 var imgUploadPreview = imgUpload.querySelector('.img-upload__preview');
 var imgPreview = imgUploadPreview.querySelector('img');
 var effectsList = imgUpload.querySelector('.effects__list');
-var effectNone = effectsList.querySelector('#effect-none');
-var effectChrome = effectsList.querySelector('#effect-chrome');
-var effectSepia = effectsList.querySelector('#effect-sepia');
-var effectMarvin = effectsList.querySelector('#effect-marvin');
-var effectPhobos = effectsList.querySelector('#effect-phobos');
-var effectHeat = effectsList.querySelector('#effect-heat');
+// var effect = effectsList.querySelector('input[type=radio]:checked');
+// var effectNone = effectsList.querySelector('#effect-none');
+// var effectChrome = effectsList.querySelector('#effect-chrome');
+// var effectSepia = effectsList.querySelector('#effect-sepia');
+// var effectMarvin = effectsList.querySelector('#effect-marvin');
+// var effectPhobos = effectsList.querySelector('#effect-phobos');
+// var effectHeat = effectsList.querySelector('#effect-heat');
 var scaleControlSmaller = imgUpload.querySelector('.scale__control--smaller');
 var scaleControlBigger = imgUpload.querySelector('.scale__control--bigger');
 var scaleControlValue = imgUpload.querySelector('.scale__control--value');
@@ -73,7 +76,7 @@ var uploadSubmit = imgUpload.querySelector('#upload-submit');
 /* Вспомогательные функции
    ========================================================================== */
 
-// Получаем случайного числа
+// Получаем случайное число
 var getRandomNumber = function (min, max) {
   return Math.round(Math.random() * (max - min) + min);
 };
@@ -145,7 +148,7 @@ var createCommentsArray = function () {
 
   for (var i = 0; i < commentsNumber; i++) {
     comments[i] = {
-      avatar: 'img/avatar-' + getRandomNumber(1, 6) + '.svg', // Нужно ли img/avatar- и svg тоже в константы вынести?
+      avatar: AVATARS_FOLDER + getRandomNumber(1, 6) + AVATARS_FORMAT,
       message: SENTENCES[getRandomNumber(0, SENTENCES.length - 1)],
       name: NAMES[getRandomNumber(0, NAMES.length - 1)]
     };
@@ -239,7 +242,7 @@ var fillOverlay = function (picture) {
   bigPicture.classList.remove('hidden');
   socialCommentCount.classList.add('visually-hidden');
   socialCommentLoad.classList.add('visually-hidden');
-  document.addEventListener('keydown', onBigPictureCloseEscKeydown);
+  document.addEventListener('keydown', onDocumentEscKeydown);
 };
 
 
@@ -263,21 +266,29 @@ var renderPictures = function (array) {
 };
 
 
-// Закрываем большую фоточку
+// Функция, скрывающая большую фоточку
 var closeBigPicture = function () {
   bigPicture.classList.add('hidden');
 };
 
+var onBigPictureCloseClick = function () {
+  closeBigPicture();
+};
 
-// Закрываем большую фоточку эскейпом
-var onBigPictureCloseEscKeydown = function (evt) {
+var onBigPictureCloseEnterKeydown = function (evt) {
+  if (evt.keyCode === Keycode.ENTER) {
+    closeBigPicture();
+  }
+};
+
+var onDocumentEscKeydown = function (evt) {
   if (evt.keyCode === Keycode.ESC) {
     closeBigPicture();
   }
 };
 
 
-// Закрываем форму редактирования изображения
+// Функция, закрывающая форму редактирования изображения
 var closeImgUpload = function () {
   var focused = document.activeElement;
 
@@ -287,6 +298,15 @@ var closeImgUpload = function () {
   }
 };
 
+var onUploadCancelClick = function () {
+  closeImgUpload();
+};
+
+var onUploadCancelEnterKeydown = function (evt) {
+  if (evt.keyCode === Keycode.ENTER) {
+    closeImgUpload();
+  }
+};
 
 // Закрываем форму редактирования изображения эскейпом
 var onImgUploadCloseEscKeydown = function (evt) {
@@ -353,6 +373,9 @@ var switchEffects = function () {
   }
 };
 
+var onEffecstListClick = function () {
+  switchEffects();
+};
 
 // Уменьшаем фоточку
 var onScaleControlSmallerClick = function () {
@@ -419,30 +442,20 @@ var pictures = createPictures();
 renderPictures(pictures);
 
 
-/* Здесь начинаются обработчики
+/* Добавляем обработчики событий
    ========================================================================== */
 
-// А если один и тот же обработчик срабатывает и на клик, и на `keydown`, как его называть?
-bigPictureClose.addEventListener('click', closeBigPicture);
+bigPictureClose.addEventListener('click', onBigPictureCloseClick);
 
-bigPictureClose.addEventListener('keydown', function (evt) {
-  if (evt.keyCode === Keycode.ENTER) {
-    closeBigPicture();
-  }
-});
+bigPictureClose.addEventListener('keydown', onBigPictureCloseEnterKeydown);
 
 fileUpload.addEventListener('change', onFileUploadChange);
 
-// Здесь тоже один обработчик на два события
-uploadCancel.addEventListener('click', closeImgUpload);
+uploadCancel.addEventListener('click', onUploadCancelClick);
 
-uploadCancel.addEventListener('keydown', function (evt) {
-  if (evt.keyCode === Keycode.ENTER) {
-    closeImgUpload();
-  }
-});
+uploadCancel.addEventListener('keydown', onUploadCancelEnterKeydown);
 
-effectsList.addEventListener('click', switchEffects);
+effectsList.addEventListener('click', onEffecstListClick);
 
 scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
 
@@ -453,6 +466,7 @@ uploadSubmit.addEventListener('click', onUploadSubmitClick);
 textHashtags.addEventListener('input', function () {
   textHashtags.setCustomValidity('');
 });
+
 
 // Двигаем пин
 effectLevelPin.addEventListener('mousedown', function (evt) {
@@ -498,19 +512,26 @@ effectLevelPin.addEventListener('mousedown', function (evt) {
     var level = Math.floor((effectLevelPin.offsetLeft - shift.x) / maxLeftCoords * 100);
     effectLevelValue.setAttribute('value', level);
     var filterValue = level / 100;
+    var effect = effectsList.querySelector('input[type=radio]:checked');
 
-    if (effectChrome.checked) {
-      imgPreview.setAttribute('style', getFilterValue('grayscale', filterValue));
-    } else if (effectSepia.checked) {
-      imgPreview.setAttribute('style', getFilterValue('sepia', filterValue));
-    } else if (effectMarvin.checked) {
-      imgPreview.setAttribute('style', getFilterValue('invert', level, '%'));
-    } else if (effectPhobos.checked) {
-      filterValue = level * 5 / 100;
-      imgPreview.setAttribute('style', getFilterValue('blur', filterValue, 'px'));
-    } else if (effectHeat.checked) {
-      filterValue = level * 3 / 100;
-      imgPreview.setAttribute('style', getFilterValue('brightness', filterValue));
+    switch (effect.id) {
+      case 'effect-chrome':
+        imgPreview.setAttribute('style', getFilterValue('grayscale', filterValue));
+        break;
+      case 'effect-sepia':
+        imgPreview.setAttribute('style', getFilterValue('sepia', filterValue));
+        break;
+      case 'effect-marvin':
+        imgPreview.setAttribute('style', getFilterValue('invert', level, '%'));
+        break;
+      case 'effect-phobos':
+        filterValue = level * 5 / 100;
+        imgPreview.setAttribute('style', getFilterValue('blur', filterValue, 'px'));
+        break;
+      case 'effect-heat':
+        filterValue = level * 3 / 100;
+        imgPreview.setAttribute('style', getFilterValue('brightness', filterValue));
+        break;
     }
   };
 
@@ -535,5 +556,5 @@ effectLevelPin.addEventListener('mousedown', function (evt) {
 });
 
 
-document.addEventListener('keydown', onBigPictureCloseEscKeydown);
+document.addEventListener('keydown', onDocumentEscKeydown);
 document.addEventListener('keydown', onImgUploadCloseEscKeydown);
