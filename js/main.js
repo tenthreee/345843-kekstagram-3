@@ -2,6 +2,8 @@
 
 var PICTURES_NUMBER = 25;
 var AVATAR_SIZE = '35';
+var PICTURES_FOLDER = 'photos/';
+var PICTURES_FORMAT = '.jpg';
 
 var SENTENCES = [
   'Всё отлично!',
@@ -42,30 +44,30 @@ var likesCount = bigPicture.querySelector('.likes-count');
 var commentsCount = bigPicture.querySelector('.comments-count');
 var socialCommentCount = bigPicture.querySelector('.social__comment-count');
 var socialCommentLoad = bigPicture.querySelector('.comments-loader');
-var bigPictureClose = document.querySelector('#picture-cancel');
-var fileUpload = document.querySelector('#upload-file');
-var imgUpload = document.querySelector('.img-upload__overlay');
-var uploadCancel = document.querySelector('#upload-cancel');
-var effectLevel = document.querySelector('.effect-level');
-var effectLeveline = document.querySelector('.effect-level__line');
-var effectLevelPin = document.querySelector('.effect-level__pin');
-var effectLevelDepth = document.querySelector('.effect-level__depth');
-var effectLevelValue = document.querySelector('.effect-level__value');
-var imgUploadPreview = document.querySelector('.img-upload__preview');
+var bigPictureClose = bigPicture.querySelector('#picture-cancel');
+var fileUpload = picturesList.querySelector('#upload-file');
+var imgUpload = picturesList.querySelector('.img-upload__overlay');
+var uploadCancel = imgUpload.querySelector('#upload-cancel');
+var effectLevel = imgUpload.querySelector('.effect-level');
+var effectLeveline = effectLevel.querySelector('.effect-level__line');
+var effectLevelPin = effectLevel.querySelector('.effect-level__pin');
+var effectLevelDepth = effectLevel.querySelector('.effect-level__depth');
+var effectLevelValue = effectLevel.querySelector('.effect-level__value');
+var imgUploadPreview = imgUpload.querySelector('.img-upload__preview');
 var imgPreview = imgUploadPreview.querySelector('img');
-var effectsList = document.querySelector('.effects__list');
-var effectNone = document. querySelector('#effect-none');
-var effectChrome = document. querySelector('#effect-chrome');
-var effectSepia = document. querySelector('#effect-sepia');
-var effectMarvin = document. querySelector('#effect-marvin');
-var effectPhobos = document. querySelector('#effect-phobos');
-var effectHeat = document. querySelector('#effect-heat');
-var scaleControlSmaller = document.querySelector('.scale__control--smaller');
-var scaleControlBigger = document.querySelector('.scale__control--bigger');
-var scaleControlValue = document.querySelector('.scale__control--value');
-var textDescription = document.querySelector('.text__description');
-var textHashtags = document.querySelector('.text__hashtags');
-var uploadSubmit = document.querySelector('#upload-submit');
+var effectsList = imgUpload.querySelector('.effects__list');
+var effectNone = effectsList.querySelector('#effect-none');
+var effectChrome = effectsList.querySelector('#effect-chrome');
+var effectSepia = effectsList.querySelector('#effect-sepia');
+var effectMarvin = effectsList.querySelector('#effect-marvin');
+var effectPhobos = effectsList.querySelector('#effect-phobos');
+var effectHeat = effectsList.querySelector('#effect-heat');
+var scaleControlSmaller = imgUpload.querySelector('.scale__control--smaller');
+var scaleControlBigger = imgUpload.querySelector('.scale__control--bigger');
+var scaleControlValue = imgUpload.querySelector('.scale__control--value');
+var textDescription = imgUpload.querySelector('.text__description');
+var textHashtags = imgUpload.querySelector('.text__hashtags');
+var uploadSubmit = imgUpload.querySelector('#upload-submit');
 
 
 /* Вспомогательные функции
@@ -78,35 +80,10 @@ var getRandomNumber = function (min, max) {
 
 
 // Меняем местами два элемента в массиве
-var swapElements = function (array, index1, index2) {
-  var temporaryValue = array[index1];
-  array[index1] = array[index2];
-  array[index2] = temporaryValue;
-};
-
-
-// Копируем массива
-var copyArray = function (array) {
-  var newArray = [];
-
-  for (var i = 0; i < array.length; i++) {
-    newArray[i] = array[i];
-  }
-
-  return newArray;
-};
-
-
-// Создаём массива нужной длины
-var createArray = function (array, length) {
-  var newArray = [];
-
-  for (var i = 0; i < length; i++) {
-    var randomIndex = getRandomNumber(0, array.length - 1);
-    newArray[i] = array[randomIndex];
-  }
-
-  return newArray;
+var swapElements = function (array, firstElemIndex, secondElemIndex) {
+  var temporaryValue = array[firstElemIndex];
+  array[firstElemIndex] = array[secondElemIndex];
+  array[secondElemIndex] = temporaryValue;
 };
 
 
@@ -123,14 +100,14 @@ var shuffleArray = function (array) {
 
 // Создаём массив комментов или описаний
 var createTextArray = function (array, length) {
-  var newArray = [];
-  var text = createArray(copyArray(array), length);
+  var textArray = new Array(length);
 
   for (var i = 0; i < length; i++) {
-    newArray[i] = text[i];
+    var randomIndex = getRandomNumber(0, array.length - 1);
+    textArray.fill(array[randomIndex], i, i + 1);
   }
 
-  return newArray;
+  return textArray;
 };
 
 
@@ -168,7 +145,7 @@ var createCommentsArray = function () {
 
   for (var i = 0; i < commentsNumber; i++) {
     comments[i] = {
-      avatar: 'img/avatar-' + getRandomNumber(1, 6) + '.svg',
+      avatar: 'img/avatar-' + getRandomNumber(1, 6) + '.svg', // Нужно ли img/avatar- и svg тоже в константы вынести?
       message: SENTENCES[getRandomNumber(0, SENTENCES.length - 1)],
       name: NAMES[getRandomNumber(0, NAMES.length - 1)]
     };
@@ -188,7 +165,7 @@ var createPictures = function () {
 
   for (var i = 0; i < PICTURES_NUMBER; i++) {
     pictures[i] = {
-      url: 'photos/' + (i + 1) + '.jpg',
+      url: PICTURES_FOLDER + (i + 1) + PICTURES_FORMAT,
       likes: getRandomNumber(15, 200),
       comments: createCommentsArray(),
       description: descriptions[i]
@@ -331,7 +308,7 @@ var resetEffect = function () {
 
 
 // Открываем форму редактирования изображения
-var openImgUpload = function () {
+var onFileUploadChange = function () {
   imgUpload.classList.remove('hidden');
   effectLevel.classList.add('hidden');
   resetEffect();
@@ -340,36 +317,45 @@ var openImgUpload = function () {
 
 
 // Применяем эффекты к фоточке
-var addEffects = function () {
-  if (effectNone.checked) {
-    imgPreview.className = '';
-    effectLevel.classList.add('hidden');
-  } else if (effectChrome.checked) {
-    resetEffect();
-    effectLevel.classList.remove('hidden');
-    imgPreview.classList.add('effects__preview--chrome');
-  } else if (effectSepia.checked) {
-    resetEffect();
-    effectLevel.classList.remove('hidden');
-    imgPreview.classList.add('effects__preview--sepia');
-  } else if (effectMarvin.checked) {
-    resetEffect();
-    effectLevel.classList.remove('hidden');
-    imgPreview.classList.add('effects__preview--marvin');
-  } else if (effectPhobos.checked) {
-    resetEffect();
-    effectLevel.classList.remove('hidden');
-    imgPreview.classList.add('effects__preview--phobos');
-  } else if (effectHeat.checked) {
-    resetEffect();
-    effectLevel.classList.remove('hidden');
-    imgPreview.classList.add('effects__preview--heat');
+var switchEffects = function () {
+  var effect = effectsList.querySelector('input[type=radio]:checked');
+
+  switch (effect.id) {
+    case 'effect-none':
+      imgPreview.className = '';
+      effectLevel.classList.add('hidden');
+      break;
+    case 'effect-chrome':
+      resetEffect();
+      effectLevel.classList.remove('hidden');
+      imgPreview.classList.add('effects__preview--chrome');
+      break;
+    case 'effect-sepia':
+      resetEffect();
+      effectLevel.classList.remove('hidden');
+      imgPreview.classList.add('effects__preview--sepia');
+      break;
+    case 'effect-marvin':
+      resetEffect();
+      effectLevel.classList.remove('hidden');
+      imgPreview.classList.add('effects__preview--marvin');
+      break;
+    case 'effect-phobos':
+      resetEffect();
+      effectLevel.classList.remove('hidden');
+      imgPreview.classList.add('effects__preview--phobos');
+      break;
+    case 'effect-heat':
+      resetEffect();
+      effectLevel.classList.remove('hidden');
+      imgPreview.classList.add('effects__preview--heat');
+      break;
   }
 };
 
 
 // Уменьшаем фоточку
-var scaleSmaller = function () {
+var onScaleControlSmallerClick = function () {
   var value = parseInt(scaleControlValue.value, 10);
 
   if (value > 25) {
@@ -384,7 +370,7 @@ var scaleSmaller = function () {
 
 
 // Увеличиваем фоточку
-var scaleBigger = function () {
+var onScaleControlBiggerClick = function () {
   var value = parseInt(scaleControlValue.value, 10);
 
   if (value < 75) {
@@ -400,7 +386,7 @@ var scaleBigger = function () {
 
 
 // Валидируем хэштеги
-var validateHasgtags = function () {
+var onUploadSubmitClick = function () {
   var userHashtags = document.querySelector('.text__hashtags').value;
   var splitHashtags = userHashtags.split(' ');
 
@@ -436,9 +422,8 @@ renderPictures(pictures);
 /* Здесь начинаются обработчики
    ========================================================================== */
 
-bigPictureClose.addEventListener('click', function () {
-  closeBigPicture();
-});
+// А если один и тот же обработчик срабатывает и на клик, и на `keydown`, как его называть?
+bigPictureClose.addEventListener('click', closeBigPicture);
 
 bigPictureClose.addEventListener('keydown', function (evt) {
   if (evt.keyCode === Keycode.ENTER) {
@@ -446,13 +431,10 @@ bigPictureClose.addEventListener('keydown', function (evt) {
   }
 });
 
-fileUpload.addEventListener('change', function () {
-  openImgUpload();
-});
+fileUpload.addEventListener('change', onFileUploadChange);
 
-uploadCancel.addEventListener('click', function () {
-  closeImgUpload();
-});
+// Здесь тоже один обработчик на два события
+uploadCancel.addEventListener('click', closeImgUpload);
 
 uploadCancel.addEventListener('keydown', function (evt) {
   if (evt.keyCode === Keycode.ENTER) {
@@ -460,21 +442,13 @@ uploadCancel.addEventListener('keydown', function (evt) {
   }
 });
 
-effectsList.addEventListener('click', function () {
-  addEffects();
-});
+effectsList.addEventListener('click', switchEffects);
 
-scaleControlSmaller.addEventListener('click', function () {
-  scaleSmaller();
-});
+scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
 
-scaleControlBigger.addEventListener('click', function () {
-  scaleBigger();
-});
+scaleControlBigger.addEventListener('click', onScaleControlBiggerClick);
 
-uploadSubmit.addEventListener('click', function () {
-  validateHasgtags();
-});
+uploadSubmit.addEventListener('click', onUploadSubmitClick);
 
 textHashtags.addEventListener('input', function () {
   textHashtags.setCustomValidity('');
@@ -526,17 +500,26 @@ effectLevelPin.addEventListener('mousedown', function (evt) {
     var filterValue = level / 100;
 
     if (effectChrome.checked) {
-      imgPreview.setAttribute('style', 'filter:grayscale(' + filterValue + ')');
+      imgPreview.setAttribute('style', getFilterValue('grayscale', filterValue));
     } else if (effectSepia.checked) {
-      imgPreview.setAttribute('style', 'filter:sepia(' + filterValue + ')');
+      imgPreview.setAttribute('style', getFilterValue('sepia', filterValue));
     } else if (effectMarvin.checked) {
-      imgPreview.setAttribute('style', 'filter:invert(' + level + '%)');
+      imgPreview.setAttribute('style', getFilterValue('invert', level, '%'));
     } else if (effectPhobos.checked) {
       filterValue = level * 5 / 100;
-      imgPreview.setAttribute('style', 'filter:blur(' + filterValue + 'px)');
+      imgPreview.setAttribute('style', getFilterValue('blur', filterValue, 'px'));
     } else if (effectHeat.checked) {
       filterValue = level * 3 / 100;
-      imgPreview.setAttribute('style', 'filter:brightness(' + filterValue + ')');
+      imgPreview.setAttribute('style', getFilterValue('brightness', filterValue));
+    }
+  };
+
+  // Получаем имя и значание фильтра
+  var getFilterValue = function (filter, value, units) {
+    if (units) {
+      return 'filter:' + filter + '(' + value + units + ')';
+    } else {
+      return 'filter:' + filter + '(' + value + ')';
     }
   };
 
