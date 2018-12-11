@@ -58,13 +58,6 @@ var effectLevelValue = effectLevel.querySelector('.effect-level__value');
 var imgUploadPreview = imgUpload.querySelector('.img-upload__preview');
 var imgPreview = imgUploadPreview.querySelector('img');
 var effectsList = imgUpload.querySelector('.effects__list');
-// var effect = effectsList.querySelector('input[type=radio]:checked');
-// var effectNone = effectsList.querySelector('#effect-none');
-// var effectChrome = effectsList.querySelector('#effect-chrome');
-// var effectSepia = effectsList.querySelector('#effect-sepia');
-// var effectMarvin = effectsList.querySelector('#effect-marvin');
-// var effectPhobos = effectsList.querySelector('#effect-phobos');
-// var effectHeat = effectsList.querySelector('#effect-heat');
 var scaleControlSmaller = imgUpload.querySelector('.scale__control--smaller');
 var scaleControlBigger = imgUpload.querySelector('.scale__control--bigger');
 var scaleControlValue = imgUpload.querySelector('.scale__control--value');
@@ -309,7 +302,7 @@ var onUploadCancelEnterKeydown = function (evt) {
 };
 
 // Закрываем форму редактирования изображения эскейпом
-var onImgUploadCloseEscKeydown = function (evt) {
+var onImgUploadEscKeydown = function (evt) {
   if (evt.keyCode === Keycode.ESC) {
     closeImgUpload();
   }
@@ -557,4 +550,4 @@ effectLevelPin.addEventListener('mousedown', function (evt) {
 
 
 document.addEventListener('keydown', onDocumentEscKeydown);
-document.addEventListener('keydown', onImgUploadCloseEscKeydown);
+document.addEventListener('keydown', onImgUploadEscKeydown);
