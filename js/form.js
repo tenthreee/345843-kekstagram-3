@@ -27,6 +27,7 @@
   var textHashtags = imgUpload.querySelector('.text__hashtags');
   var uploadSubmit = imgUpload.querySelector('#upload-submit');
 
+
   // Функция, закрывающая форму редактирования изображения
   var closeImgUpload = function () {
     var focused = document.activeElement;
@@ -193,45 +194,25 @@
   effectLevelPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
-    var maxLeftCoords = effectLeveline.offsetWidth;
-    var minLeftCoords = 0;
-
-    var startCoords = {
-      x: evt.clientX,
-      y: evt.clientY
-    };
-
-    // Ограничиваем перемещение пина
-    var checkLimits = function (shift) {
-      if (effectLevelPin.offsetLeft > maxLeftCoords) {
-        effectLevelPin.style.left = maxLeftCoords + 'px';
-        effectLevelDepth.setAttribute('style', 'width:100%');
-      } else if (effectLevelPin.offsetLeft < minLeftCoords) {
-        effectLevelPin.style.left = minLeftCoords + 'px';
-        effectLevelDepth.setAttribute('style', 'width:0px');
-      } else {
-        effectLevelPin.style.left = (effectLevelPin.offsetLeft - shift.x) + 'px';
-        effectLevelDepth.setAttribute('style', 'width:' + effectLevelPin.style.left);
-      }
-    };
+    var startX = evt.clientX;
 
     var onPinMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
-      var shift = {
-        x: startCoords.x - moveEvt.clientX,
-        y: startCoords.y - moveEvt.clientY
-      };
+      var shift = startX - moveEvt.clientX;
 
-      startCoords = {
-        x: moveEvt.clientX,
-        y: moveEvt.clientY
-      };
+      var effectLevelLineLeft = effectLeveline.getBoundingClientRect().left;
+      var effectLevelPinLeft = Math.round((startX - shift - effectLevelLineLeft) / effectLeveline.offsetWidth * 100);
 
-      checkLimits(shift);
+      if (effectLevelPinLeft > 100 || effectLevelPinLeft < 0) {
+        return;
+      }
+
+      effectLevelPin.style.left = effectLevelPinLeft + '%';
+      effectLevelDepth.style.width = effectLevelPinLeft + '%';
 
       // Меняем глубину эффекта при перемещнии пина
-      var level = Math.floor((effectLevelPin.offsetLeft - shift.x) / maxLeftCoords * 100);
+      var level = effectLevelPinLeft;
       effectLevelValue.setAttribute('value', level);
       var filterValue = level / 100;
       var effect = effectsList.querySelector('input[type=radio]:checked');
