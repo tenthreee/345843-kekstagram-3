@@ -3,9 +3,13 @@
 (function () {
   var AVATARS_FOLDER = 'img/avatar-';
   var AVATARS_FORMAT = '.svg';
+  var AVATARS_NUMBER = 6;
   var PICTURES_NUMBER = 25;
   var PICTURES_FOLDER = 'photos/';
   var PICTURES_FORMAT = '.jpg';
+  var COMMENTS_NUMBER = 10;
+  var MIN_LIKES = 15;
+  var MAX_LIKES = 100;
 
   var SENTENCES = [
     'Всё отлично!',
@@ -43,12 +47,12 @@
 
   // Создаём массив объектов, описывающих комментарии
   var createCommentsArray = function () {
-    var commentsNumber = window.util.getRandomNumber(1, 10);
+    var commentsNumber = window.util.getRandomNumber(1, COMMENTS_NUMBER);
     var comments = [];
 
     for (var i = 0; i < commentsNumber; i++) {
       comments[i] = {
-        avatar: AVATARS_FOLDER + window.util.getRandomNumber(1, 6) + AVATARS_FORMAT,
+        avatar: AVATARS_FOLDER + window.util.getRandomNumber(1, AVATARS_NUMBER) + AVATARS_FORMAT,
         message: SENTENCES[window.util.getRandomNumber(0, SENTENCES.length - 1)],
         name: NAMES[window.util.getRandomNumber(0, NAMES.length - 1)]
       };
@@ -65,7 +69,7 @@
     for (var i = 0; i < PICTURES_NUMBER; i++) {
       pictures[i] = {
         url: PICTURES_FOLDER + (i + 1) + PICTURES_FORMAT,
-        likes: window.util.getRandomNumber(15, 200),
+        likes: window.util.getRandomNumber(MIN_LIKES, MAX_LIKES),
         comments: createCommentsArray(),
         description: descriptions[i]
       };
