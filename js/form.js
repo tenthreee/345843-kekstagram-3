@@ -9,6 +9,7 @@
   var MAX_HASHTAG_LENGTH = 20;
 
   var picturesList = document.querySelector('.pictures');
+  var form = picturesList.querySelector('.img-upload__form');
   var fileUpload = picturesList.querySelector('#upload-file');
   var imgUpload = picturesList.querySelector('.img-upload__overlay');
   var uploadCancel = imgUpload.querySelector('#upload-cancel');
@@ -26,6 +27,11 @@
   var textDescription = imgUpload.querySelector('.text__description');
   var textHashtags = imgUpload.querySelector('.text__hashtags');
   var uploadSubmit = imgUpload.querySelector('#upload-submit');
+  var main = document.querySelector('main');
+  var successTemplate = document.querySelector('#success');
+  var success = successTemplate.content.querySelector('.success');
+  var errorTemplate = document.querySelector('#error');
+  var error = errorTemplate.content.querySelector('.error');
 
 
   // Функция, закрывающая форму редактирования изображения
@@ -34,7 +40,7 @@
 
     if (focused !== textDescription && focused !== textHashtags) {
       imgUpload.classList.add('hidden');
-      fileUpload.reset();
+      form.reset();
     }
   };
 
@@ -53,6 +59,56 @@
     if (evt.keyCode === window.util.Keycode.ESC) {
       closeImgUpload();
     }
+  };
+
+
+  // Закрываем модалки
+  var closeSuccess = function () {
+    main.removeChild(document.querySelector('.success'));
+  };
+
+  var closeError = function () {
+    main.removeChild(document.querySelector('.error'));
+  };
+
+  var onSuccessButtonClick = function () {
+    closeSuccess();
+  };
+
+  var onErrorButtonClick = function () {
+    closeError();
+  };
+
+  var onSuccessButtonEnterKeydown = function (evt) {
+    if (evt.keyCode === window.util.Keycode.ENTER) {
+      closeSuccess();
+    }
+  };
+
+  var onErrorButtonEnterKeydown = function (evt) {
+    if (evt.keyCode === window.util.Keycode.ENTER) {
+      closeError();
+    }
+  };
+
+  var onSuccessEscKeydown = function (evt) {
+    if (evt.keyCode === window.util.Keycode.ESC) {
+      closeSuccess();
+    }
+  };
+
+  var onErrorEscKeydown = function (evt) {
+    if (evt.keyCode === window.util.Keycode.ESC) {
+      closeError();
+    }
+  };
+
+  var onSuccessClick = function () {
+    closeSuccess();
+  };
+
+  var onErrorClick = function () {
+    closeError();
   };
 
 
@@ -150,7 +206,7 @@
 
 
   // Валидируем хэштеги
-  var onUploadSubmitClick = function () {
+  var validateHashtags = function () {
     var userHashtags = document.querySelector('.text__hashtags').value;
     var splitHashtags = userHashtags.split(' ');
 
@@ -164,18 +220,54 @@
 
       if (sameHashtags > 1) {
         textHashtags.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
+        textHashtags.style = 'border:1px solid red';
       }
       if (currentHashtag[0] !== '#') {
         textHashtags.setCustomValidity('Хэш-тег должен начинаться с символа #');
+        textHashtags.style = 'border:1px solid red';
       }
       if (currentHashtag.length < MIN_HASHTAG_LENGTH) {
         textHashtags.setCustomValidity('Хэш-тег не может состоять только из одного символа');
+        textHashtags.style = 'border:1px solid red';
       }
       if (currentHashtag.length > MAX_HASHTAG_LENGTH) {
         textHashtags.setCustomValidity('Максимальная длина одного хэш-тега — 20 символов, включая решётку');
+        textHashtags.style = 'border:1px solid red';
+      } else {
+        textHashtags.style = '';
       }
     }
   };
+
+  var onUploadSubmitClick = function (evt) {
+    validateHashtags();
+
+    window.backend.upLoad(new FormData(form), onSuccsessUpload, onErrorUpload);
+    evt.preventDefault();
+  };
+
+  var onSuccsessUpload = function () {
+    closeImgUpload();
+    var successMessage = success.cloneNode(true);
+
+    main.appendChild(successMessage);
+    document.querySelector('.success__button').addEventListener('click', onSuccessButtonClick);
+    document.querySelector('.success__button').addEventListener('keydown', onSuccessButtonEnterKeydown);
+    document.addEventListener('keydown', onSuccessEscKeydown);
+    document.querySelector('.success').addEventListener('click', onSuccessClick);
+  };
+
+  var onErrorUpload = function () {
+    closeImgUpload();
+    var errorMessage = error.cloneNode(true);
+
+    main.appendChild(errorMessage);
+    document.querySelector('.error__button').addEventListener('click', onErrorButtonClick);
+    document.querySelector('.error__button').addEventListener('keydown', onErrorButtonEnterKeydown);
+    document.addEventListener('keydown', onErrorEscKeydown);
+    document.querySelector('.error').addEventListener('click', onErrorClick);
+  };
+
 
   fileUpload.addEventListener('change', onFileUploadChange);
   uploadCancel.addEventListener('click', onUploadCancelClick);
@@ -183,7 +275,8 @@
   effectsList.addEventListener('click', onEffecstListClick);
   scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
   scaleControlBigger.addEventListener('click', onScaleControlBiggerClick);
-  uploadSubmit.addEventListener('click', onUploadSubmitClick);
+  uploadSubmit.addEventListener('click', validateHashtags);
+  form.addEventListener('submit', onUploadSubmitClick);
 
   textHashtags.addEventListener('input', function () {
     textHashtags.setCustomValidity('');

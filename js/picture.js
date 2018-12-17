@@ -18,8 +18,8 @@
   };
 
 
-  // Отрисовываем фоточки
-  var renderPictures = function (array) {
+  // Успешное выполнение запроса
+  var onSuccsessDownload = function (array) {
     var fragment = document.createDocumentFragment();
 
     for (var i = 0; i < array.length; i++) {
@@ -37,11 +37,18 @@
     picturesList.appendChild(fragment);
   };
 
-  var pictures = window.data.createPictures();
-  renderPictures(pictures);
+  // Неуспешное выполнение запроса
+  var onErrorDownload = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
 
-  window.picture = {
-    renderPictures: renderPictures
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
   };
 
+  window.backend.downLoad(onSuccsessDownload, onErrorDownload);
 })();
