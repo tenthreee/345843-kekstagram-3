@@ -37,10 +37,10 @@
   var createTextArray = function (array, length) {
     var textArray = new Array(length);
 
-    for (var i = 0; i < length; i++) {
+    textArray.forEach(function (elem, index, arr) {
       var randomIndex = window.util.getRandomNumber(0, array.length - 1);
-      textArray.fill(array[randomIndex], i, i + 1);
-    }
+      arr[index] = array[randomIndex];
+    });
 
     return textArray;
   };

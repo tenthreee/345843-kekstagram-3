@@ -22,10 +22,10 @@
 
   // Перемешиваем массив
   var shuffleArray = function (array) {
-    for (var i = 0; i < array.length; i++) {
-      var randomIndex = getRandomNumber(0, array.length - 1);
-      swapElements(array, i, randomIndex);
-    }
+    array.forEach(function (elem, index, arr) {
+      var randomIndex = getRandomNumber(0, arr.length - 1);
+      swapElements(arr, index, randomIndex);
+    });
 
     return array;
   };

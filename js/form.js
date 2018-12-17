@@ -34,7 +34,7 @@
   var error = errorTemplate.content.querySelector('.error');
 
 
-  // Функция, закрывающая форму редактирования изображения
+  // Закрываем форму редактирования изображения
   var closeImgUpload = function () {
     var focused = document.activeElement;
 
@@ -54,7 +54,6 @@
     }
   };
 
-  // Закрываем форму редактирования изображения эскейпом
   var onImgUploadEscKeydown = function (evt) {
     if (evt.keyCode === window.util.Keycode.ESC) {
       closeImgUpload();
@@ -239,6 +238,7 @@
     }
   };
 
+  // Отправляем данные из формы
   var onUploadSubmitClick = function (evt) {
     validateHashtags();
 
@@ -269,6 +269,7 @@
   };
 
 
+  // Накидываем обработчики
   fileUpload.addEventListener('change', onFileUploadChange);
   uploadCancel.addEventListener('click', onUploadCancelClick);
   uploadCancel.addEventListener('keydown', onUploadCancelEnterKeydown);
