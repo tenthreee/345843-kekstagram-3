@@ -33,15 +33,15 @@
 
   // Ищем дубль в массиве
   var searchDuplicate = function (elem, arr) {
-    var dubl = 0;
+    var duplicate = 0;
 
     for (var i = 0; i < arr.length; i++) {
       if (arr[i] === elem) {
-        dubl += 1;
+        duplicate += 1;
       }
     }
 
-    return dubl;
+    return duplicate;
   };
 
   window.util = {

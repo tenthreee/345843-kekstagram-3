@@ -25,7 +25,7 @@
     for (var i = 0; i < array.length; i++) {
       var currentPicture = getPicture(array[i]);
 
-      currentPicture.setAttribute('data-id', i);
+      currentPicture.dataset.id = i;
       fragment.appendChild(currentPicture);
 
       currentPicture.addEventListener('click', function (evt) {

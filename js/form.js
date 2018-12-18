@@ -1,12 +1,72 @@
 'use strict';
 
 (function () {
-  var SCALE_STEP = 25;
-  var MIN_SCALE = 25;
-  var MAX_SCALE = 100;
-  var MAX_HASHTAGS = 5;
-  var MIN_HASHTAG_LENGTH = 2;
-  var MAX_HASHTAG_LENGTH = 20;
+  var Scale = {
+    MIN: 25,
+    MAX: 100,
+    STEP: 25
+  };
+
+  var Hashtag = {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 20,
+    MAX_NUMBER: 5
+  };
+
+  var EffectValue = {
+    MIN: 0,
+    MAX: 100
+  };
+
+  var imgEffects = {
+    chrome: {
+      name: 'chrome',
+      filter: 'grayscale',
+      min: 0,
+      max: 1,
+      unit: ''
+    },
+
+    sepia: {
+      name: 'sepia',
+      filter: 'sepia',
+      min: 0,
+      max: 1,
+      unit: ''
+    },
+
+    marvin: {
+      name: 'marvin',
+      filter: 'invert',
+      min: 0,
+      max: 100,
+      unit: '%'
+    },
+
+    phobos: {
+      name: 'phobos',
+      filter: 'blur',
+      min: 0,
+      max: 3,
+      unit: 'px'
+    },
+
+    heat: {
+      name: 'heat',
+      filter: 'brightness',
+      min: 1,
+      max: 3,
+      unit: ''
+    }
+  };
+
+  var hashtagMessage = {
+    toomany: 'Нельзя указать больше пяти хэш-тегов',
+    same: 'Один и тот же хэш-тег не может быть использован дважды',
+    nothash: 'Хэш-тег должен начинаться с символа #',
+    short: 'Хэш-тег не может состоять только из одного символа',
+    long: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку'
+  };
 
   var picturesList = document.querySelector('.pictures');
   var form = picturesList.querySelector('.img-upload__form');
@@ -144,27 +204,27 @@
       case 'effect-chrome':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--chrome');
+        imgPreview.classList.add('effects__preview--' + imgEffects.chrome.name);
         break;
       case 'effect-sepia':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--sepia');
+        imgPreview.classList.add('effects__preview--' + imgEffects.sepia.name);
         break;
       case 'effect-marvin':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--marvin');
+        imgPreview.classList.add('effects__preview--' + imgEffects.marvin.name);
         break;
       case 'effect-phobos':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--phobos');
+        imgPreview.classList.add('effects__preview--' + imgEffects.phobos.name);
         break;
       case 'effect-heat':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--heat');
+        imgPreview.classList.add('effects__preview--' + imgEffects.heat.name);
         break;
     }
   };
@@ -177,11 +237,11 @@
   var onScaleControlSmallerClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
-    if (value > MIN_SCALE) {
-      value -= SCALE_STEP;
+    if (value > Scale.MIN) {
+      value -= Scale.STEP;
       imgPreview.setAttribute('style', 'transform:scale(0.' + value + ')');
       scaleControlValue.value = value + '%';
-    } else if (value <= MIN_SCALE) {
+    } else if (value <= Scale.MIN) {
       imgPreview.setAttribute('style', 'transform:scale(0.25)');
       scaleControlValue.value = value + '%';
     }
@@ -192,12 +252,12 @@
   var onScaleControlBiggerClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
-    if (value < MAX_SCALE - SCALE_STEP) {
-      value += SCALE_STEP;
+    if (value < Scale.MAX - Scale.STEP) {
+      value += Scale.STEP;
       imgPreview.setAttribute('style', 'transform:scale(0.' + value + ')');
       scaleControlValue.value = value + '%';
-    } else if (value >= MAX_SCALE - SCALE_STEP && value < MAX_SCALE) {
-      value += SCALE_STEP;
+    } else if (value >= Scale.MAX - Scale.STEP && value < Scale.MAX) {
+      value += Scale.STEP;
       imgPreview.removeAttribute('style');
       scaleControlValue.value = value + '%';
     }
@@ -209,8 +269,9 @@
     var userHashtags = document.querySelector('.text__hashtags').value;
     var splitHashtags = userHashtags.split(' ');
 
-    if (splitHashtags.length > MAX_HASHTAGS) {
-      textHashtags.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
+    if (splitHashtags.length > Hashtag.MAX_NUMBER) {
+      textHashtags.setCustomValidity(hashtagMessage.toomany);
+      textHashtags.style = 'border:1px solid red';
     }
 
     for (var i = 0; i < splitHashtags.length; i++) {
@@ -218,19 +279,19 @@
       var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
 
       if (sameHashtags > 1) {
-        textHashtags.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
+        textHashtags.setCustomValidity(hashtagMessage.same);
         textHashtags.style = 'border:1px solid red';
       }
       if (currentHashtag[0] !== '#') {
-        textHashtags.setCustomValidity('Хэш-тег должен начинаться с символа #');
+        textHashtags.setCustomValidity(hashtagMessage.nothash);
         textHashtags.style = 'border:1px solid red';
       }
-      if (currentHashtag.length < MIN_HASHTAG_LENGTH) {
-        textHashtags.setCustomValidity('Хэш-тег не может состоять только из одного символа');
+      if (currentHashtag.length < Hashtag.MIN_LENGTH) {
+        textHashtags.setCustomValidity(hashtagMessage.short);
         textHashtags.style = 'border:1px solid red';
       }
-      if (currentHashtag.length > MAX_HASHTAG_LENGTH) {
-        textHashtags.setCustomValidity('Максимальная длина одного хэш-тега — 20 символов, включая решётку');
+      if (currentHashtag.length > Hashtag.MAX_LENGTH) {
+        textHashtags.setCustomValidity(hashtagMessage.long);
         textHashtags.style = 'border:1px solid red';
       } else {
         textHashtags.style = '';
@@ -279,6 +340,11 @@
   uploadSubmit.addEventListener('click', validateHashtags);
   form.addEventListener('submit', onUploadSubmitClick);
 
+
+  // — Нам точно это нужно делать при каждом срабатывании input?
+  //
+  // — Видимо, нет, раз ты спрашиваешь :) Меня устроило, как в этой реализации
+  // появлялись сообщения, на ней я и остановилась :D
   textHashtags.addEventListener('input', function () {
     textHashtags.setCustomValidity('');
   });
@@ -298,7 +364,7 @@
       var effectLevelLineLeft = effectLeveline.getBoundingClientRect().left;
       var effectLevelPinLeft = Math.round((startX - shift - effectLevelLineLeft) / effectLeveline.offsetWidth * 100);
 
-      if (effectLevelPinLeft > 100 || effectLevelPinLeft < 0) {
+      if (effectLevelPinLeft > EffectValue.MAX || effectLevelPinLeft < EffectValue.MIN) {
         return;
       }
 
@@ -308,37 +374,38 @@
       // Меняем глубину эффекта при перемещнии пина
       var level = effectLevelPinLeft;
       effectLevelValue.setAttribute('value', level);
-      var filterValue = level / 100;
+      var filterValue = level / EffectValue.MAX;
       var effect = effectsList.querySelector('input[type=radio]:checked');
 
       switch (effect.id) {
         case 'effect-chrome':
-          imgPreview.setAttribute('style', getFilterValue('grayscale', filterValue));
+          imgPreview.setAttribute('style', setFilterValue(imgEffects.chrome.filter, filterValue));
           break;
         case 'effect-sepia':
-          imgPreview.setAttribute('style', getFilterValue('sepia', filterValue));
+          imgPreview.setAttribute('style', setFilterValue(imgEffects.sepia.filter, filterValue));
           break;
         case 'effect-marvin':
-          imgPreview.setAttribute('style', getFilterValue('invert', level, '%'));
+          filterValue = level;
+          imgPreview.setAttribute('style', setFilterValue(imgEffects.marvin.filter, filterValue, imgEffects.marvin.unit));
           break;
         case 'effect-phobos':
-          filterValue = level * 5 / 100;
-          imgPreview.setAttribute('style', getFilterValue('blur', filterValue, 'px'));
+          filterValue = level * imgEffects.phobos.max / EffectValue.MAX;
+          imgPreview.setAttribute('style', setFilterValue(imgEffects.phobos.filter, filterValue, imgEffects.phobos.unit));
           break;
         case 'effect-heat':
-          filterValue = level * 3 / 100;
-          imgPreview.setAttribute('style', getFilterValue('brightness', filterValue));
+          filterValue = level * imgEffects.heat.max / EffectValue.MAX; // Не понимаю, как правильно посчитать значение для этого фильтра. И вообще нужна какая-то универсальная функция для подсчёта, наверное
+          imgPreview.setAttribute('style', setFilterValue(imgEffects.heat.filter, filterValue));
           break;
       }
     };
 
-    // Получаем имя и значание фильтра
-    var getFilterValue = function (filter, value, units) {
+    // Ставим фильтр
+    var setFilterValue = function (filter, value, units) {
       if (units) {
         return 'filter:' + filter + '(' + value + units + ')';
-      } else {
-        return 'filter:' + filter + '(' + value + ')';
       }
+
+      return 'filter:' + filter + '(' + value + ')';
     };
 
     var onPinMouseUp = function (upEvt) {
