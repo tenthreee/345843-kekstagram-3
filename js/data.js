@@ -1,15 +1,24 @@
 'use strict';
 
 (function () {
-  var AVATARS_FOLDER = 'img/avatar-';
-  var AVATARS_FORMAT = '.svg';
-  var AVATARS_NUMBER = 6;
-  var PICTURES_NUMBER = 25;
-  var PICTURES_FOLDER = 'photos/';
-  var PICTURES_FORMAT = '.jpg';
+  var Avatar = {
+    FOLDER: 'img/avatar-',
+    FORMAT: '.svg',
+    NUMBER: 6
+  };
+
+  var Picture = {
+    FOLDER: 'photos/',
+    FORMAT: '.jpg',
+    NUMBER: 25
+  };
+
+  var Like = {
+    MIN: 15,
+    MAX: 100
+  };
+
   var COMMENTS_NUMBER = 10;
-  var MIN_LIKES = 15;
-  var MAX_LIKES = 100;
 
   var SENTENCES = [
     'Всё отлично!',
@@ -52,7 +61,7 @@
 
     for (var i = 0; i < commentsNumber; i++) {
       comments[i] = {
-        avatar: AVATARS_FOLDER + window.util.getRandomNumber(1, AVATARS_NUMBER) + AVATARS_FORMAT,
+        avatar: Avatar.FOLDER + window.util.getRandomNumber(1, Avatar.NUMBER) + Avatar.FORMAT,
         message: SENTENCES[window.util.getRandomNumber(0, SENTENCES.length - 1)],
         name: NAMES[window.util.getRandomNumber(0, NAMES.length - 1)]
       };
@@ -64,12 +73,12 @@
   // Создаём массив фоточек
   var createPictures = function () {
     var pictures = [];
-    var descriptions = createTextArray(DESCRIPTIONS, PICTURES_NUMBER);
+    var descriptions = createTextArray(DESCRIPTIONS, Picture.NUMBER);
 
-    for (var i = 0; i < PICTURES_NUMBER; i++) {
+    for (var i = 0; i < Picture.NUMBER; i++) {
       pictures[i] = {
-        url: PICTURES_FOLDER + (i + 1) + PICTURES_FORMAT,
-        likes: window.util.getRandomNumber(MIN_LIKES, MAX_LIKES),
+        url: Picture.FOLDER + (i + 1) + Picture.FORMAT,
+        likes: window.util.getRandomNumber(Like.MIN, Like.MAX),
         comments: createCommentsArray(),
         description: descriptions[i]
       };
