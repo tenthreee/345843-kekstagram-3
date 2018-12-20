@@ -18,8 +18,8 @@
     MAX: 100
   };
 
-  var imgEffects = {
-    chrome: {
+  var ImgEffect = {
+    CHROME: {
       name: 'chrome',
       filter: 'grayscale',
       min: 0,
@@ -27,7 +27,7 @@
       unit: ''
     },
 
-    sepia: {
+    SEPIA: {
       name: 'sepia',
       filter: 'sepia',
       min: 0,
@@ -35,7 +35,7 @@
       unit: ''
     },
 
-    marvin: {
+    MARVIN: {
       name: 'marvin',
       filter: 'invert',
       min: 0,
@@ -43,7 +43,7 @@
       unit: '%'
     },
 
-    phobos: {
+    PHOBOS: {
       name: 'phobos',
       filter: 'blur',
       min: 0,
@@ -51,7 +51,7 @@
       unit: 'px'
     },
 
-    heat: {
+    HEAT: {
       name: 'heat',
       filter: 'brightness',
       min: 1,
@@ -60,12 +60,12 @@
     }
   };
 
-  var hashtagMessage = {
-    toomany: 'Нельзя указать больше пяти хэш-тегов',
-    same: 'Один и тот же хэш-тег не может быть использован дважды',
-    nothash: 'Хэш-тег должен начинаться с символа #',
-    short: 'Хэш-тег не может состоять только из одного символа',
-    long: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку'
+  var HashtagMessage = {
+    TOOMANY: 'Нельзя указать больше пяти хэш-тегов',
+    SAME: 'Один и тот же хэш-тег не может быть использован дважды',
+    NOTHASH: 'Хэш-тег должен начинаться с символа #',
+    SHORT: 'Хэш-тег не может состоять только из одного символа',
+    LONG: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку'
   };
 
   var picturesList = document.querySelector('.pictures');
@@ -204,27 +204,27 @@
       case 'effect-chrome':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + imgEffects.chrome.name);
+        imgPreview.classList.add('effects__preview--' + ImgEffect.CHROME.name);
         break;
       case 'effect-sepia':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + imgEffects.sepia.name);
+        imgPreview.classList.add('effects__preview--' + ImgEffect.SEPIA.name);
         break;
       case 'effect-marvin':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + imgEffects.marvin.name);
+        imgPreview.classList.add('effects__preview--' + ImgEffect.MARVIN.name);
         break;
       case 'effect-phobos':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + imgEffects.phobos.name);
+        imgPreview.classList.add('effects__preview--' + ImgEffect.PHOBOS.name);
         break;
       case 'effect-heat':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + imgEffects.heat.name);
+        imgPreview.classList.add('effects__preview--' + ImgEffect.HEAT.name);
         break;
     }
   };
@@ -270,7 +270,7 @@
     var splitHashtags = userHashtags.split(' ');
 
     if (splitHashtags.length > Hashtag.MAX_NUMBER) {
-      textHashtags.setCustomValidity(hashtagMessage.toomany);
+      textHashtags.setCustomValidity(HashtagMessage.TOOMANY);
       textHashtags.style = 'border:1px solid red';
     }
 
@@ -279,19 +279,19 @@
       var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
 
       if (sameHashtags > 1) {
-        textHashtags.setCustomValidity(hashtagMessage.same);
+        textHashtags.setCustomValidity(HashtagMessage.SAME);
         textHashtags.style = 'border:1px solid red';
       }
       if (currentHashtag[0] !== '#') {
-        textHashtags.setCustomValidity(hashtagMessage.nothash);
+        textHashtags.setCustomValidity(HashtagMessage.NOTHASH);
         textHashtags.style = 'border:1px solid red';
       }
       if (currentHashtag.length < Hashtag.MIN_LENGTH) {
-        textHashtags.setCustomValidity(hashtagMessage.short);
+        textHashtags.setCustomValidity(HashtagMessage.SHORT);
         textHashtags.style = 'border:1px solid red';
       }
       if (currentHashtag.length > Hashtag.MAX_LENGTH) {
-        textHashtags.setCustomValidity(hashtagMessage.long);
+        textHashtags.setCustomValidity(HashtagMessage.LONG);
         textHashtags.style = 'border:1px solid red';
       } else {
         textHashtags.style = '';
@@ -379,22 +379,22 @@
 
       switch (effect.id) {
         case 'effect-chrome':
-          imgPreview.setAttribute('style', setFilterValue(imgEffects.chrome.filter, filterValue));
+          imgPreview.setAttribute('style', setFilterValue(ImgEffect.CHROME.filter, filterValue));
           break;
         case 'effect-sepia':
-          imgPreview.setAttribute('style', setFilterValue(imgEffects.sepia.filter, filterValue));
+          imgPreview.setAttribute('style', setFilterValue(ImgEffect.SEPIA.filter, filterValue));
           break;
         case 'effect-marvin':
           filterValue = level;
-          imgPreview.setAttribute('style', setFilterValue(imgEffects.marvin.filter, filterValue, imgEffects.marvin.unit));
+          imgPreview.setAttribute('style', setFilterValue(ImgEffect.MARVIN.filter, filterValue, ImgEffect.MARVIN.unit));
           break;
         case 'effect-phobos':
-          filterValue = level * imgEffects.phobos.max / EffectValue.MAX;
-          imgPreview.setAttribute('style', setFilterValue(imgEffects.phobos.filter, filterValue, imgEffects.phobos.unit));
+          filterValue = level * ImgEffect.PHOBOS.max / EffectValue.MAX;
+          imgPreview.setAttribute('style', setFilterValue(ImgEffect.PHOBOS.filter, filterValue, ImgEffect.PHOBOS.unit));
           break;
         case 'effect-heat':
-          filterValue = level * imgEffects.heat.max / EffectValue.MAX; // Не понимаю, как правильно посчитать значение для этого фильтра. И вообще нужна какая-то универсальная функция для подсчёта, наверное
-          imgPreview.setAttribute('style', setFilterValue(imgEffects.heat.filter, filterValue));
+          filterValue = level * ImgEffect.HEAT.max / EffectValue.MAX; // Не понимаю, как правильно посчитать значение для этого фильтра. И вообще нужна какая-то универсальная функция для подсчёта, наверное
+          imgPreview.setAttribute('style', setFilterValue(ImgEffect.HEAT.filter, filterValue));
           break;
       }
     };
