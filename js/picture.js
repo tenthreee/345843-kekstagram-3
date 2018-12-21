@@ -1,9 +1,40 @@
 'use strict';
 
 (function () {
+  var NEW_PICTURES_COUNT = 10;
+
   var picturesList = document.querySelector('.pictures');
   var template = document.querySelector('#picture');
   var pictureTemplate = template.content.querySelector('.picture');
+  var filterPopular = document.querySelector('#filter-popular');
+  var filterNew = document.querySelector('#filter-new');
+  var filterDiscussed = document.querySelector('#filter-discussed');
+  var pictures = [];
+
+
+  // Удаляем фотографии из разметки
+  var removePictures = function () {
+    while (picturesList.querySelector('.picture')) {
+      picturesList.removeChild(picturesList.querySelector('.picture'));
+    }
+  };
+
+
+  // Сортируем фотки по количеству комментариев
+  var sortPictures = function (array) {
+    var arrayCopy = array.slice();
+    arrayCopy.sort(function (first, second) {
+      if (first.comments.length > second.comments.length) {
+        return -1;
+      } else if (first.comments.length < second.comments.length) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+
+    return arrayCopy;
+  };
 
 
   // Создаём болванку для превьюшки
@@ -18,11 +49,11 @@
   };
 
 
-  // Успешное выполнение запроса
-  var onSuccsessDownload = function (array) {
+  // Отрисовываем фотки
+  var renderPictures = function (array, length) {
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < array.length; i++) {
+    for (var i = 0; i < length; i++) {
       var currentPicture = getPicture(array[i]);
 
       currentPicture.dataset.id = i;
@@ -36,6 +67,57 @@
 
     picturesList.appendChild(fragment);
   };
+
+
+  // Успешное выполнение запроса
+  var onSuccsessDownload = function (array) {
+    removePictures();
+    renderPictures(array, array.length);
+
+    document.querySelector('.img-filters').classList.remove('img-filters--inactive');
+  };
+
+  var onFilterPopularClick = function () {
+    filterPopular.classList.add('img-filters__button--active');
+    filterNew.classList.remove('img-filters__button--active');
+    filterDiscussed.classList.remove('img-filters__button--active');
+    window.backend.downLoad(onSuccsessDownload, onErrorDownload);
+  };
+
+  // Показываем обсуждаемые фотографии
+  var showDiscussedPictures = function (array) {
+    removePictures();
+
+    pictures = array;
+    var newArray = sortPictures(pictures);
+
+    renderPictures(newArray, newArray.length);
+  };
+
+  var onFilterDiscussedClick = function () {
+    filterDiscussed.classList.add('img-filters__button--active');
+    filterNew.classList.remove('img-filters__button--active');
+    filterPopular.classList.remove('img-filters__button--active');
+    window.backend.downLoad(showDiscussedPictures, onErrorDownload);
+  };
+
+  // Показываем новые фотографии
+  var showNewPictures = function (array) {
+    removePictures();
+
+    pictures = array;
+    var newArray = window.util.shuffleArray(pictures);
+
+    renderPictures(newArray, NEW_PICTURES_COUNT);
+  };
+
+  var onFilterNewClick = function () {
+    filterNew.classList.add('img-filters__button--active');
+    filterPopular.classList.remove('img-filters__button--active');
+    filterDiscussed.classList.remove('img-filters__button--active');
+    window.backend.downLoad(showNewPictures, onErrorDownload);
+  };
+
 
   // Неуспешное выполнение запроса
   var onErrorDownload = function (errorMessage) {
@@ -51,4 +133,10 @@
   };
 
   window.backend.downLoad(onSuccsessDownload, onErrorDownload);
+
+
+  // Обработчки кликов по кнопкам сортировки
+  filterPopular.addEventListener('click', onFilterPopularClick);
+  filterNew.addEventListener('click', onFilterNewClick);
+  filterDiscussed.addEventListener('click', onFilterDiscussedClick);
 })();
