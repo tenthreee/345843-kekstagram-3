@@ -56,11 +56,12 @@
   // Добавляем комментарий в разметку
   var addComments = function (picture) {
     var fragment = document.createDocumentFragment();
+    var comments = picture.comments;
 
-    for (var i = 0; i < picture.comments.length; i++) {
-      var comment = picture.comments[i];
+    comments.forEach(function (elem, index, array) {
+      var comment = array[index];
       fragment.appendChild(createComment(comment));
-    }
+    });
 
     commentsList.appendChild(fragment);
   };

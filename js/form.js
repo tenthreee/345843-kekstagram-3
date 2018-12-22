@@ -1,14 +1,75 @@
 'use strict';
 
 (function () {
-  var SCALE_STEP = 25;
-  var MIN_SCALE = 25;
-  var MAX_SCALE = 100;
-  var MAX_HASHTAGS = 5;
-  var MIN_HASHTAG_LENGTH = 2;
-  var MAX_HASHTAG_LENGTH = 20;
+  var Scale = {
+    MIN: 25,
+    MAX: 100,
+    STEP: 25
+  };
+
+  var Hashtag = {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 20,
+    MAX_NUMBER: 5
+  };
+
+  var EffectValue = {
+    MIN: 0,
+    MAX: 100
+  };
+
+  var ImgEffect = {
+    CHROME: {
+      name: 'chrome',
+      filter: 'grayscale',
+      min: 0,
+      max: 1,
+      unit: ''
+    },
+
+    SEPIA: {
+      name: 'sepia',
+      filter: 'sepia',
+      min: 0,
+      max: 1,
+      unit: ''
+    },
+
+    MARVIN: {
+      name: 'marvin',
+      filter: 'invert',
+      min: 0,
+      max: 100,
+      unit: '%'
+    },
+
+    PHOBOS: {
+      name: 'phobos',
+      filter: 'blur',
+      min: 0,
+      max: 3,
+      unit: 'px'
+    },
+
+    HEAT: {
+      name: 'heat',
+      filter: 'brightness',
+      min: 1,
+      max: 3,
+      unit: ''
+    }
+  };
+
+  var HashtagMessage = {
+    TOOMANY: 'Нельзя указать больше пяти хэш-тегов',
+    SAME: 'Один и тот же хэш-тег не может быть использован дважды',
+    NOTHASH: 'Хэш-тег должен начинаться с символа #',
+    SHORT: 'Хэш-тег не может состоять только из одного символа',
+    LONG: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку'
+  };
 
   var picturesList = document.querySelector('.pictures');
+  var form = picturesList.querySelector('.img-upload__form');
   var fileUpload = picturesList.querySelector('#upload-file');
   var imgUpload = picturesList.querySelector('.img-upload__overlay');
   var uploadCancel = imgUpload.querySelector('#upload-cancel');
@@ -26,15 +87,20 @@
   var textDescription = imgUpload.querySelector('.text__description');
   var textHashtags = imgUpload.querySelector('.text__hashtags');
   var uploadSubmit = imgUpload.querySelector('#upload-submit');
+  var main = document.querySelector('main');
+  var successTemplate = document.querySelector('#success');
+  var success = successTemplate.content.querySelector('.success');
+  var errorTemplate = document.querySelector('#error');
+  var error = errorTemplate.content.querySelector('.error');
 
 
-  // Функция, закрывающая форму редактирования изображения
+  // Закрываем форму редактирования изображения
   var closeImgUpload = function () {
     var focused = document.activeElement;
 
     if (focused !== textDescription && focused !== textHashtags) {
       imgUpload.classList.add('hidden');
-      fileUpload.reset();
+      form.reset();
     }
   };
 
@@ -48,11 +114,60 @@
     }
   };
 
-  // Закрываем форму редактирования изображения эскейпом
   var onImgUploadEscKeydown = function (evt) {
     if (evt.keyCode === window.util.Keycode.ESC) {
       closeImgUpload();
     }
+  };
+
+
+  // Закрываем модалки
+  var closeSuccess = function () {
+    main.removeChild(document.querySelector('.success'));
+  };
+
+  var closeError = function () {
+    main.removeChild(document.querySelector('.error'));
+  };
+
+  var onSuccessButtonClick = function () {
+    closeSuccess();
+  };
+
+  var onErrorButtonClick = function () {
+    closeError();
+  };
+
+  var onSuccessButtonEnterKeydown = function (evt) {
+    if (evt.keyCode === window.util.Keycode.ENTER) {
+      closeSuccess();
+    }
+  };
+
+  var onErrorButtonEnterKeydown = function (evt) {
+    if (evt.keyCode === window.util.Keycode.ENTER) {
+      closeError();
+    }
+  };
+
+  var onSuccessEscKeydown = function (evt) {
+    if (evt.keyCode === window.util.Keycode.ESC) {
+      closeSuccess();
+    }
+  };
+
+  var onErrorEscKeydown = function (evt) {
+    if (evt.keyCode === window.util.Keycode.ESC) {
+      closeError();
+    }
+  };
+
+  var onSuccessClick = function () {
+    closeSuccess();
+  };
+
+  var onErrorClick = function () {
+    closeError();
   };
 
 
@@ -89,27 +204,27 @@
       case 'effect-chrome':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--chrome');
+        imgPreview.classList.add('effects__preview--' + ImgEffect.CHROME.name);
         break;
       case 'effect-sepia':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--sepia');
+        imgPreview.classList.add('effects__preview--' + ImgEffect.SEPIA.name);
         break;
       case 'effect-marvin':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--marvin');
+        imgPreview.classList.add('effects__preview--' + ImgEffect.MARVIN.name);
         break;
       case 'effect-phobos':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--phobos');
+        imgPreview.classList.add('effects__preview--' + ImgEffect.PHOBOS.name);
         break;
       case 'effect-heat':
         resetEffect();
         effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--heat');
+        imgPreview.classList.add('effects__preview--' + ImgEffect.HEAT.name);
         break;
     }
   };
@@ -122,11 +237,11 @@
   var onScaleControlSmallerClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
-    if (value > MIN_SCALE) {
-      value -= SCALE_STEP;
+    if (value > Scale.MIN) {
+      value -= Scale.STEP;
       imgPreview.setAttribute('style', 'transform:scale(0.' + value + ')');
       scaleControlValue.value = value + '%';
-    } else if (value <= MIN_SCALE) {
+    } else if (value <= Scale.MIN) {
       imgPreview.setAttribute('style', 'transform:scale(0.25)');
       scaleControlValue.value = value + '%';
     }
@@ -137,12 +252,12 @@
   var onScaleControlBiggerClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
-    if (value < MAX_SCALE - SCALE_STEP) {
-      value += SCALE_STEP;
+    if (value < Scale.MAX - Scale.STEP) {
+      value += Scale.STEP;
       imgPreview.setAttribute('style', 'transform:scale(0.' + value + ')');
       scaleControlValue.value = value + '%';
-    } else if (value >= MAX_SCALE - SCALE_STEP && value < MAX_SCALE) {
-      value += SCALE_STEP;
+    } else if (value >= Scale.MAX - Scale.STEP && value < Scale.MAX) {
+      value += Scale.STEP;
       imgPreview.removeAttribute('style');
       scaleControlValue.value = value + '%';
     }
@@ -150,12 +265,13 @@
 
 
   // Валидируем хэштеги
-  var onUploadSubmitClick = function () {
+  var validateHashtags = function () {
     var userHashtags = document.querySelector('.text__hashtags').value;
     var splitHashtags = userHashtags.split(' ');
 
-    if (splitHashtags.length > MAX_HASHTAGS) {
-      textHashtags.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
+    if (splitHashtags.length > Hashtag.MAX_NUMBER) {
+      textHashtags.setCustomValidity(HashtagMessage.TOOMANY);
+      textHashtags.style = 'border:1px solid red';
     }
 
     for (var i = 0; i < splitHashtags.length; i++) {
@@ -163,28 +279,72 @@
       var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
 
       if (sameHashtags > 1) {
-        textHashtags.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
+        textHashtags.setCustomValidity(HashtagMessage.SAME);
+        textHashtags.style = 'border:1px solid red';
       }
       if (currentHashtag[0] !== '#') {
-        textHashtags.setCustomValidity('Хэш-тег должен начинаться с символа #');
+        textHashtags.setCustomValidity(HashtagMessage.NOTHASH);
+        textHashtags.style = 'border:1px solid red';
       }
-      if (currentHashtag.length < MIN_HASHTAG_LENGTH) {
-        textHashtags.setCustomValidity('Хэш-тег не может состоять только из одного символа');
+      if (currentHashtag.length < Hashtag.MIN_LENGTH) {
+        textHashtags.setCustomValidity(HashtagMessage.SHORT);
+        textHashtags.style = 'border:1px solid red';
       }
-      if (currentHashtag.length > MAX_HASHTAG_LENGTH) {
-        textHashtags.setCustomValidity('Максимальная длина одного хэш-тега — 20 символов, включая решётку');
+      if (currentHashtag.length > Hashtag.MAX_LENGTH) {
+        textHashtags.setCustomValidity(HashtagMessage.LONG);
+        textHashtags.style = 'border:1px solid red';
+      } else {
+        textHashtags.style = '';
       }
     }
   };
 
+  // Отправляем данные из формы
+  var onUploadSubmitClick = function (evt) {
+    validateHashtags();
+
+    window.backend.upLoad(new FormData(form), onSuccsessUpload, onErrorUpload);
+    evt.preventDefault();
+  };
+
+  var onSuccsessUpload = function () {
+    closeImgUpload();
+    var successMessage = success.cloneNode(true);
+
+    main.appendChild(successMessage);
+    document.querySelector('.success__button').addEventListener('click', onSuccessButtonClick);
+    document.querySelector('.success__button').addEventListener('keydown', onSuccessButtonEnterKeydown);
+    document.addEventListener('keydown', onSuccessEscKeydown);
+    document.querySelector('.success').addEventListener('click', onSuccessClick);
+  };
+
+  var onErrorUpload = function () {
+    closeImgUpload();
+    var errorMessage = error.cloneNode(true);
+
+    main.appendChild(errorMessage);
+    document.querySelector('.error__button').addEventListener('click', onErrorButtonClick);
+    document.querySelector('.error__button').addEventListener('keydown', onErrorButtonEnterKeydown);
+    document.addEventListener('keydown', onErrorEscKeydown);
+    document.querySelector('.error').addEventListener('click', onErrorClick);
+  };
+
+
+  // Накидываем обработчики
   fileUpload.addEventListener('change', onFileUploadChange);
   uploadCancel.addEventListener('click', onUploadCancelClick);
   uploadCancel.addEventListener('keydown', onUploadCancelEnterKeydown);
   effectsList.addEventListener('click', onEffecstListClick);
   scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
   scaleControlBigger.addEventListener('click', onScaleControlBiggerClick);
-  uploadSubmit.addEventListener('click', onUploadSubmitClick);
+  uploadSubmit.addEventListener('click', validateHashtags);
+  form.addEventListener('submit', onUploadSubmitClick);
 
+
+  // — Нам точно это нужно делать при каждом срабатывании input?
+  //
+  // — Видимо, нет, раз ты спрашиваешь :) Меня устроило, как в этой реализации
+  // появлялись сообщения, на ней я и остановилась :D
   textHashtags.addEventListener('input', function () {
     textHashtags.setCustomValidity('');
   });
@@ -204,7 +364,7 @@
       var effectLevelLineLeft = effectLeveline.getBoundingClientRect().left;
       var effectLevelPinLeft = Math.round((startX - shift - effectLevelLineLeft) / effectLeveline.offsetWidth * 100);
 
-      if (effectLevelPinLeft > 100 || effectLevelPinLeft < 0) {
+      if (effectLevelPinLeft > EffectValue.MAX || effectLevelPinLeft < EffectValue.MIN) {
         return;
       }
 
@@ -214,37 +374,38 @@
       // Меняем глубину эффекта при перемещнии пина
       var level = effectLevelPinLeft;
       effectLevelValue.setAttribute('value', level);
-      var filterValue = level / 100;
+      var filterValue = level / EffectValue.MAX;
       var effect = effectsList.querySelector('input[type=radio]:checked');
 
       switch (effect.id) {
         case 'effect-chrome':
-          imgPreview.setAttribute('style', getFilterValue('grayscale', filterValue));
+          imgPreview.setAttribute('style', setFilterValue(ImgEffect.CHROME.filter, filterValue));
           break;
         case 'effect-sepia':
-          imgPreview.setAttribute('style', getFilterValue('sepia', filterValue));
+          imgPreview.setAttribute('style', setFilterValue(ImgEffect.SEPIA.filter, filterValue));
           break;
         case 'effect-marvin':
-          imgPreview.setAttribute('style', getFilterValue('invert', level, '%'));
+          filterValue = level;
+          imgPreview.setAttribute('style', setFilterValue(ImgEffect.MARVIN.filter, filterValue, ImgEffect.MARVIN.unit));
           break;
         case 'effect-phobos':
-          filterValue = level * 5 / 100;
-          imgPreview.setAttribute('style', getFilterValue('blur', filterValue, 'px'));
+          filterValue = level * ImgEffect.PHOBOS.max / EffectValue.MAX;
+          imgPreview.setAttribute('style', setFilterValue(ImgEffect.PHOBOS.filter, filterValue, ImgEffect.PHOBOS.unit));
           break;
         case 'effect-heat':
-          filterValue = level * 3 / 100;
-          imgPreview.setAttribute('style', getFilterValue('brightness', filterValue));
+          filterValue = level * ImgEffect.HEAT.max / EffectValue.MAX; // Не понимаю, как правильно посчитать значение для этого фильтра. И вообще нужна какая-то универсальная функция для подсчёта, наверное
+          imgPreview.setAttribute('style', setFilterValue(ImgEffect.HEAT.filter, filterValue));
           break;
       }
     };
 
-    // Получаем имя и значание фильтра
-    var getFilterValue = function (filter, value, units) {
+    // Ставим фильтр
+    var setFilterValue = function (filter, value, units) {
       if (units) {
         return 'filter:' + filter + '(' + value + units + ')';
-      } else {
-        return 'filter:' + filter + '(' + value + ')';
       }
+
+      return 'filter:' + filter + '(' + value + ')';
     };
 
     var onPinMouseUp = function (upEvt) {

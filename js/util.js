@@ -22,10 +22,10 @@
 
   // Перемешиваем массив
   var shuffleArray = function (array) {
-    for (var i = 0; i < array.length; i++) {
-      var randomIndex = getRandomNumber(0, array.length - 1);
-      swapElements(array, i, randomIndex);
-    }
+    array.forEach(function (elem, index, arr) {
+      var randomIndex = getRandomNumber(0, arr.length - 1);
+      swapElements(arr, index, randomIndex);
+    });
 
     return array;
   };
@@ -33,15 +33,15 @@
 
   // Ищем дубль в массиве
   var searchDuplicate = function (elem, arr) {
-    var dubl = 0;
+    var duplicate = 0;
 
     for (var i = 0; i < arr.length; i++) {
       if (arr[i] === elem) {
-        dubl += 1;
+        duplicate += 1;
       }
     }
 
-    return dubl;
+    return duplicate;
   };
 
   window.util = {
