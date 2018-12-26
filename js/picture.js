@@ -23,7 +23,7 @@
   };
 
 
-  // Сортируем фотки по количеству комментариев
+  // Сортируем фотографии по количеству комментариев
   var sortPictures = function (array) {
     var arrayCopy = array.slice();
     arrayCopy.sort(function (first, second) {
@@ -40,7 +40,7 @@
   };
 
 
-  // Создаём болванку для превьюшки
+  // Создаём болванку для превью фотографии
   var getPicture = function (picture) {
     var pictureElement = pictureTemplate.cloneNode(true);
 
@@ -52,7 +52,7 @@
   };
 
 
-  // Отрисовываем фотки
+  // Отрисовываем фотографии
   var renderPictures = function (array, length) {
     var fragment = document.createDocumentFragment();
 
@@ -72,15 +72,7 @@
   };
 
 
-  // Успешное выполнение запроса
-  var onSuccsessDownload = function (array) {
-    removePictures();
-    renderPictures(array, array.length);
-
-    document.querySelector('.img-filters').classList.remove('img-filters--inactive');
-  };
-
-
+  // Показываем, какой фильтр выбран
   var activateButton = function (evt) {
     document.querySelectorAll('.img-filters__button').forEach(function (elem) {
       elem.classList.remove('img-filters__button--active');
@@ -96,6 +88,7 @@
     window.backend.downLoad(onSuccsessDownload, onErrorDownload);
   });
 
+
   // Показываем обсуждаемые фотографии
   var showDiscussedPictures = function (array) {
     var newArray = sortPictures(array);
@@ -108,6 +101,7 @@
     activateButton(evt);
     window.backend.downLoad(showDiscussedPictures, onErrorDownload);
   });
+
 
   // Показываем новые фотографии
   var showNewPictures = function (array) {
@@ -123,6 +117,15 @@
   });
 
 
+  // Успешное выполнение запроса
+  var onSuccsessDownload = function (array) {
+    removePictures();
+    renderPictures(array, array.length);
+
+    document.querySelector('.img-filters').classList.remove('img-filters--inactive');
+  };
+
+
   // Неуспешное выполнение запроса
   var onErrorDownload = function (errorMessage) {
     var node = document.createElement('div');
@@ -136,6 +139,8 @@
     document.body.insertAdjacentElement('afterbegin', node);
   };
 
+
+  // Получаем данные о фотографиях
   window.backend.downLoad(onSuccsessDownload, onErrorDownload);
 
 

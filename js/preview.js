@@ -104,7 +104,7 @@
   };
 
 
-  // Функция, скрывающая большую фоточку
+  // Cкрываем большую фоточку
   var closeBigPicture = function () {
     bigPicture.classList.add('hidden');
     document.removeEventListener('keydown', onBigPictureEscKeydown);
@@ -117,15 +117,11 @@
   };
 
   var onBigPictureCloseEnterKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ENTER) {
-      closeBigPicture();
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeBigPicture);
   };
 
   var onBigPictureEscKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ESC) {
-      closeBigPicture();
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeBigPicture);
   };
 
   window.preview = {

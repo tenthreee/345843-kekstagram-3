@@ -119,15 +119,11 @@
   };
 
   var onUploadCancelEnterKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ENTER) {
-      closeImgUpload();
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeImgUpload);
   };
 
   var onImgUploadEscKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ESC) {
-      closeImgUpload();
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeImgUpload);
   };
 
 
@@ -163,27 +159,19 @@
   };
 
   var onSuccessButtonEnterKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ENTER) {
-      closeModal('.success', '.success__button');
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeModal('.success', '.success__button'));
   };
 
   var onErrorButtonEnterKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ENTER) {
-      closeModal('.error', '.error__button');
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeModal('.error', '.error__button'));
   };
 
   var onSuccessEscKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ESC) {
-      closeModal('.success', '.success__button');
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeModal('.success', '.success__button'));
   };
 
   var onErrorEscKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ESC) {
-      closeModal('.error', '.error__button');
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeModal('.error', '.error__button'));
   };
 
   var onSuccessClick = function () {
@@ -201,7 +189,6 @@
     imgPreview.className = '';
 
     effectLevelDepth.setAttribute('style', 'width:100%');
-    // effectLevelDepth.style = 'width:100%';
     effectLevelPin.setAttribute('style', 'left:100%');
     effectLevelValue.setAttribute('value', '100');
     scaleControlValue.setAttribute('value', '100%');
