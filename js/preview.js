@@ -2,6 +2,7 @@
 
 (function () {
   var AVATAR_SIZE = '35';
+  var COMMENTS_COUNT = 5;
 
   var bigPicture = document.querySelector('.big-picture');
   var bigPictureImage = bigPicture.querySelector('.big-picture__img');
@@ -17,9 +18,13 @@
 
   // Удаляем дефолтные комментарии из разметки
   var removeComment = function () {
-    while (commentsList.firstChild) {
-      commentsList.removeChild(commentsList.firstChild);
-    }
+    var comments = commentsList.querySelectorAll('.social__comment');
+    var comment;
+
+    comments.forEach(function (elem, index, array) {
+      comment = array[index];
+      commentsList.removeChild(comment);
+    });
   };
 
 
@@ -58,10 +63,17 @@
     var fragment = document.createDocumentFragment();
     var comments = picture.comments;
 
-    comments.forEach(function (elem, index, array) {
-      var comment = array[index];
-      fragment.appendChild(createComment(comment));
-    });
+    if (comments.length > COMMENTS_COUNT) {
+      for (var i = 0; i < COMMENTS_COUNT; i++) {
+        var comment = comments[i];
+        fragment.appendChild(createComment(comment));
+      }
+    } else {
+      comments.forEach(function (elem, index, array) {
+        comment = array[index];
+        fragment.appendChild(createComment(comment));
+      });
+    }
 
     commentsList.appendChild(fragment);
   };
@@ -78,8 +90,15 @@
     addComments(picture);
 
     bigPicture.classList.remove('hidden');
-    socialCommentCount.classList.add('visually-hidden');
-    socialCommentLoad.classList.add('visually-hidden');
+
+    if (picture.comments.length < COMMENTS_COUNT) {
+      socialCommentCount.innerHTML = picture.comments.length + ' из <span class="comments-count">' + picture.comments.length + '</span> комментариев';
+      socialCommentLoad.classList.add('visually-hidden');
+    } else {
+      socialCommentCount.innerHTML = COMMENTS_COUNT + ' из <span class="comments-count">' + picture.comments.length + '</span> комментариев';
+      socialCommentLoad.classList.remove('visually-hidden');
+    }
+
     document.addEventListener('keydown', onBigPictureEscKeydown);
   };
 

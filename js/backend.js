@@ -7,8 +7,8 @@
     UPLOAD: 'https://js.dump.academy/kekstagram/' // Отправляем данные
   };
 
+  var TIMEOUT = 10000;
   var okStatus = 200;
-  var timeout = 10000;
 
   var createXHR = function (url, method, onLoad, onError, data) {
     var xhr = new XMLHttpRequest();
@@ -30,7 +30,7 @@
       onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
 
-    xhr.timeout = timeout;
+    xhr.timeout = TIMEOUT;
 
     xhr.open(method, url);
     xhr.send(data);

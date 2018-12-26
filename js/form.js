@@ -340,11 +340,6 @@
   uploadSubmit.addEventListener('click', validateHashtags);
   form.addEventListener('submit', onUploadSubmitClick);
 
-
-  // — Нам точно это нужно делать при каждом срабатывании input?
-  //
-  // — Видимо, нет, раз ты спрашиваешь :) Меня устроило, как в этой реализации
-  // появлялись сообщения, на ней я и остановилась :D
   textHashtags.addEventListener('input', function () {
     textHashtags.setCustomValidity('');
   });
