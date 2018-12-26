@@ -5,8 +5,7 @@
   var COMMENTS_COUNT = 5;
 
   var bigPicture = document.querySelector('.big-picture');
-  var bigPictureImage = bigPicture.querySelector('.big-picture__img');
-  var bigPictureImg = bigPictureImage.querySelector('img');
+  var bigPictureImg = bigPicture.querySelector('img');
   var socialCaption = bigPicture.querySelector('.social__caption');
   var likesCount = bigPicture.querySelector('.likes-count');
   var commentsCount = bigPicture.querySelector('.comments-count');
@@ -100,12 +99,17 @@
     }
 
     document.addEventListener('keydown', onBigPictureEscKeydown);
+    bigPictureClose.addEventListener('click', onBigPictureCloseClick);
+    bigPictureClose.addEventListener('keydown', onBigPictureCloseEnterKeydown);
   };
 
 
   // Функция, скрывающая большую фоточку
   var closeBigPicture = function () {
     bigPicture.classList.add('hidden');
+    document.removeEventListener('keydown', onBigPictureEscKeydown);
+    bigPictureClose.removeEventListener('click', onBigPictureCloseClick);
+    bigPictureClose.removeEventListener('keydown', onBigPictureCloseEnterKeydown);
   };
 
   var onBigPictureCloseClick = function () {
@@ -123,9 +127,6 @@
       closeBigPicture();
     }
   };
-
-  bigPictureClose.addEventListener('click', onBigPictureCloseClick);
-  bigPictureClose.addEventListener('keydown', onBigPictureCloseEnterKeydown);
 
   window.preview = {
     fillOverlay: fillOverlay

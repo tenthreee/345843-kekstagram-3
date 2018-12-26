@@ -101,6 +101,16 @@
     if (focused !== textDescription && focused !== textHashtags) {
       imgUpload.classList.add('hidden');
       form.reset();
+
+      document.removeEventListener('keydown', onImgUploadEscKeydown);
+      uploadCancel.removeEventListener('click', onUploadCancelClick);
+      uploadCancel.removeEventListener('keydown', onUploadCancelEnterKeydown);
+      effectsList.removeEventListener('click', onEffecstListClick);
+      scaleControlSmaller.removeEventListener('click', onScaleControlSmallerClick);
+      scaleControlBigger.removeEventListener('click', onScaleControlBiggerClick);
+      uploadSubmit.removeEventListener('click', validateHashtags);
+      form.removeEventListener('submit', onUploadSubmitClick);
+      textHashtags.removeEventListener('input', onTextHashtagsInput);
     }
   };
 
@@ -121,53 +131,67 @@
   };
 
 
-  // Закрываем модалки
-  var closeSuccess = function () {
-    main.removeChild(document.querySelector('.success'));
+  // Показываем модалки
+  var showModal = function (template, modal, button) {
+    closeImgUpload();
+    var message = template.cloneNode(true);
+
+    main.appendChild(message);
+    document.querySelector(button).addEventListener('click', onSuccessButtonClick);
+    document.querySelector(button).addEventListener('keydown', onSuccessButtonEnterKeydown);
+    document.addEventListener('keydown', onSuccessEscKeydown);
+    document.querySelector(modal).addEventListener('click', onSuccessClick);
   };
 
-  var closeError = function () {
-    main.removeChild(document.querySelector('.error'));
+
+  // Закрываем модалки
+  var closeModal = function (modal, button) {
+    main.removeChild(document.querySelector(modal));
+
+    document.querySelector(button).removeEventListener('click', onErrorButtonClick);
+    document.querySelector(button).removeEventListener('keydown', onErrorButtonEnterKeydown);
+    document.removeEventListener('keydown', onErrorEscKeydown);
+    document.querySelector(modal).removeEventListener('click', onErrorClick);
   };
 
   var onSuccessButtonClick = function () {
-    closeSuccess();
+    closeModal('.success', '.success__button');
   };
 
   var onErrorButtonClick = function () {
-    closeError();
+    closeModal('.error', '.error__button');
   };
 
   var onSuccessButtonEnterKeydown = function (evt) {
     if (evt.keyCode === window.util.Keycode.ENTER) {
-      closeSuccess();
+      closeModal('.success', '.success__button');
     }
   };
 
   var onErrorButtonEnterKeydown = function (evt) {
     if (evt.keyCode === window.util.Keycode.ENTER) {
-      closeError();
+      closeModal('.error', '.error__button');
     }
   };
 
   var onSuccessEscKeydown = function (evt) {
     if (evt.keyCode === window.util.Keycode.ESC) {
-      closeSuccess();
+      closeModal('.success', '.success__button');
     }
   };
 
   var onErrorEscKeydown = function (evt) {
     if (evt.keyCode === window.util.Keycode.ESC) {
-      closeError();
+      closeModal('.error', '.error__button');
     }
   };
 
   var onSuccessClick = function () {
-    closeSuccess();
+    closeModal('.success', '.success__button');
   };
 
   var onErrorClick = function () {
-    closeError();
+    closeModal('.error', '.error__button');
   };
 
 
@@ -180,6 +204,7 @@
     // effectLevelDepth.style = 'width:100%';
     effectLevelPin.setAttribute('style', 'left:100%');
     effectLevelValue.setAttribute('value', '100');
+    scaleControlValue.setAttribute('value', '100%');
   };
 
 
@@ -188,8 +213,20 @@
     imgUpload.classList.remove('hidden');
     effectLevel.classList.add('hidden');
     resetEffect();
-    scaleControlValue.setAttribute('value', '100%'); // Делаем значение поля по умолчанию 100% (ТЗ 2.1)
+
     document.addEventListener('keydown', onImgUploadEscKeydown);
+    uploadCancel.addEventListener('click', onUploadCancelClick);
+    uploadCancel.addEventListener('keydown', onUploadCancelEnterKeydown);
+    effectsList.addEventListener('click', onEffecstListClick);
+    scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
+    scaleControlBigger.addEventListener('click', onScaleControlBiggerClick);
+    uploadSubmit.addEventListener('click', validateHashtags);
+    form.addEventListener('submit', onUploadSubmitClick);
+    textHashtags.addEventListener('input', onTextHashtagsInput);
+  };
+
+  var onTextHashtagsInput = function () {
+    textHashtags.setCustomValidity('');
   };
 
 
@@ -231,6 +268,17 @@
   };
 
 
+  // Прописываем уровень фильтра
+  var setFilterValue = function (filter, value, units) {
+    if (units) {
+      return 'filter:' + filter + '(' + value + units + ')';
+    }
+
+    return 'filter:' + filter + '(' + value + ')';
+  };
+
+
+  // Меняем масштаб фоточки
   var setScale = function (value) {
     if (value >= 100) {
       imgPreview.removeAttribute('style');
@@ -241,7 +289,6 @@
     }
   };
 
-  // Уменьшаем фоточку
   var onScaleControlSmallerClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
@@ -253,8 +300,6 @@
     }
   };
 
-
-  // Увеличиваем фоточку
   var onScaleControlBiggerClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
@@ -269,7 +314,7 @@
 
 
   // Валидируем хэштеги
-  var showError = function (message) {
+  var showValidationError = function (message) {
     textHashtags.setCustomValidity(message);
     textHashtags.style = 'border:1px solid red';
   };
@@ -279,7 +324,7 @@
     var splitHashtags = userHashtags.split(' ');
 
     if (splitHashtags.length > Hashtag.MAX_NUMBER) {
-      showError(HashtagMessage.TOO_MANY);
+      showValidationError(HashtagMessage.TOO_MANY);
     }
 
     for (var i = 0; i < splitHashtags.length; i++) {
@@ -287,66 +332,21 @@
       var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
 
       if (sameHashtags > 1) {
-        showError(HashtagMessage.SAME);
+        showValidationError(HashtagMessage.SAME);
       }
       if (currentHashtag[0] !== '#') {
-        showError(HashtagMessage.NOT_HASH);
+        showValidationError(HashtagMessage.NOT_HASH);
       }
       if (currentHashtag.length < Hashtag.MIN_LENGTH) {
-        showError(HashtagMessage.SHORT);
+        showValidationError(HashtagMessage.SHORT);
       }
       if (currentHashtag.length > Hashtag.MAX_LENGTH) {
-        showError(HashtagMessage.LONG);
+        showValidationError(HashtagMessage.LONG);
       } else {
         textHashtags.style = '';
       }
     }
   };
-
-  // Отправляем данные из формы
-  var onUploadSubmitClick = function (evt) {
-    validateHashtags();
-
-    window.backend.upLoad(new FormData(form), onSuccsessUpload, onErrorUpload);
-    evt.preventDefault();
-  };
-
-  var onSuccsessUpload = function () {
-    closeImgUpload();
-    var successMessage = success.cloneNode(true);
-
-    main.appendChild(successMessage);
-    document.querySelector('.success__button').addEventListener('click', onSuccessButtonClick);
-    document.querySelector('.success__button').addEventListener('keydown', onSuccessButtonEnterKeydown);
-    document.addEventListener('keydown', onSuccessEscKeydown);
-    document.querySelector('.success').addEventListener('click', onSuccessClick);
-  };
-
-  var onErrorUpload = function () {
-    closeImgUpload();
-    var errorMessage = error.cloneNode(true);
-
-    main.appendChild(errorMessage);
-    document.querySelector('.error__button').addEventListener('click', onErrorButtonClick);
-    document.querySelector('.error__button').addEventListener('keydown', onErrorButtonEnterKeydown);
-    document.addEventListener('keydown', onErrorEscKeydown);
-    document.querySelector('.error').addEventListener('click', onErrorClick);
-  };
-
-
-  // Накидываем обработчики
-  fileUpload.addEventListener('change', onFileUploadChange);
-  uploadCancel.addEventListener('click', onUploadCancelClick);
-  uploadCancel.addEventListener('keydown', onUploadCancelEnterKeydown);
-  effectsList.addEventListener('click', onEffecstListClick);
-  scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
-  scaleControlBigger.addEventListener('click', onScaleControlBiggerClick);
-  uploadSubmit.addEventListener('click', validateHashtags);
-  form.addEventListener('submit', onUploadSubmitClick);
-
-  textHashtags.addEventListener('input', function () {
-    textHashtags.setCustomValidity('');
-  });
 
 
   // Двигаем пин
@@ -398,15 +398,6 @@
       }
     };
 
-    // Ставим фильтр
-    var setFilterValue = function (filter, value, units) {
-      if (units) {
-        return 'filter:' + filter + '(' + value + units + ')';
-      }
-
-      return 'filter:' + filter + '(' + value + ')';
-    };
-
     var onPinMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
@@ -418,4 +409,24 @@
     document.addEventListener('mouseup', onPinMouseUp);
   });
 
+
+  // Отправляем данные из формы
+  var onSuccsessUpload = function () {
+    showModal(success, '.success', '.success__button');
+  };
+
+  var onErrorUpload = function () {
+    showModal(error, '.error', '.error__button');
+  };
+
+  var onUploadSubmitClick = function (evt) {
+    validateHashtags();
+
+    window.backend.upLoad(new FormData(form), onSuccsessUpload, onErrorUpload);
+    evt.preventDefault();
+  };
+
+
+  // Накидываем обработчики
+  fileUpload.addEventListener('change', onFileUploadChange);
 })();
