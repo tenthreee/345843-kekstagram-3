@@ -61,9 +61,9 @@
   };
 
   var HashtagMessage = {
-    TOOMANY: 'Нельзя указать больше пяти хэш-тегов',
+    TOO_MANY: 'Нельзя указать больше пяти хэш-тегов',
     SAME: 'Один и тот же хэш-тег не может быть использован дважды',
-    NOTHASH: 'Хэш-тег должен начинаться с символа #',
+    NOT_HASH: 'Хэш-тег должен начинаться с символа #',
     SHORT: 'Хэш-тег не может состоять только из одного символа',
     LONG: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку'
   };
@@ -177,6 +177,7 @@
     imgPreview.className = '';
 
     effectLevelDepth.setAttribute('style', 'width:100%');
+    // effectLevelDepth.style = 'width:100%';
     effectLevelPin.setAttribute('style', 'left:100%');
     effectLevelValue.setAttribute('value', '100');
   };
@@ -193,6 +194,12 @@
 
 
   // Применяем эффекты к фоточке
+  var setEffect = function (effect) {
+    resetEffect();
+    effectLevel.classList.remove('hidden');
+    imgPreview.classList.add('effects__preview--' + effect);
+  };
+
   var switchEffects = function () {
     var effect = effectsList.querySelector('input[type=radio]:checked');
 
@@ -202,29 +209,19 @@
         effectLevel.classList.add('hidden');
         break;
       case 'effect-chrome':
-        resetEffect();
-        effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + ImgEffect.CHROME.name);
+        setEffect(ImgEffect.CHROME.name);
         break;
       case 'effect-sepia':
-        resetEffect();
-        effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + ImgEffect.SEPIA.name);
+        setEffect(ImgEffect.SEPIA.name);
         break;
       case 'effect-marvin':
-        resetEffect();
-        effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + ImgEffect.MARVIN.name);
+        setEffect(ImgEffect.MARVIN.name);
         break;
       case 'effect-phobos':
-        resetEffect();
-        effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + ImgEffect.PHOBOS.name);
+        setEffect(ImgEffect.PHOBOS.name);
         break;
       case 'effect-heat':
-        resetEffect();
-        effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + ImgEffect.HEAT.name);
+        setEffect(ImgEffect.HEAT.name);
         break;
     }
   };
@@ -233,17 +230,26 @@
     switchEffects();
   };
 
+
+  var setScale = function (value) {
+    if (value >= 100) {
+      imgPreview.removeAttribute('style');
+      scaleControlValue.value = value + '%';
+    } else {
+      imgPreview.setAttribute('style', 'transform:scale(0.' + value + ')');
+      scaleControlValue.value = value + '%';
+    }
+  };
+
   // Уменьшаем фоточку
   var onScaleControlSmallerClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
     if (value > Scale.MIN) {
       value -= Scale.STEP;
-      imgPreview.setAttribute('style', 'transform:scale(0.' + value + ')');
-      scaleControlValue.value = value + '%';
+      setScale(value);
     } else if (value <= Scale.MIN) {
-      imgPreview.setAttribute('style', 'transform:scale(0.25)');
-      scaleControlValue.value = value + '%';
+      setScale(Scale.MIN);
     }
   };
 
@@ -254,24 +260,26 @@
 
     if (value < Scale.MAX - Scale.STEP) {
       value += Scale.STEP;
-      imgPreview.setAttribute('style', 'transform:scale(0.' + value + ')');
-      scaleControlValue.value = value + '%';
+      setScale(value);
     } else if (value >= Scale.MAX - Scale.STEP && value < Scale.MAX) {
       value += Scale.STEP;
-      imgPreview.removeAttribute('style');
-      scaleControlValue.value = value + '%';
+      setScale(value);
     }
   };
 
 
   // Валидируем хэштеги
+  var showError = function (message) {
+    textHashtags.setCustomValidity(message);
+    textHashtags.style = 'border:1px solid red';
+  };
+
   var validateHashtags = function () {
     var userHashtags = document.querySelector('.text__hashtags').value;
     var splitHashtags = userHashtags.split(' ');
 
     if (splitHashtags.length > Hashtag.MAX_NUMBER) {
-      textHashtags.setCustomValidity(HashtagMessage.TOOMANY);
-      textHashtags.style = 'border:1px solid red';
+      showError(HashtagMessage.TOO_MANY);
     }
 
     for (var i = 0; i < splitHashtags.length; i++) {
@@ -279,20 +287,16 @@
       var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
 
       if (sameHashtags > 1) {
-        textHashtags.setCustomValidity(HashtagMessage.SAME);
-        textHashtags.style = 'border:1px solid red';
+        showError(HashtagMessage.SAME);
       }
       if (currentHashtag[0] !== '#') {
-        textHashtags.setCustomValidity(HashtagMessage.NOTHASH);
-        textHashtags.style = 'border:1px solid red';
+        showError(HashtagMessage.NOT_HASH);
       }
       if (currentHashtag.length < Hashtag.MIN_LENGTH) {
-        textHashtags.setCustomValidity(HashtagMessage.SHORT);
-        textHashtags.style = 'border:1px solid red';
+        showError(HashtagMessage.SHORT);
       }
       if (currentHashtag.length > Hashtag.MAX_LENGTH) {
-        textHashtags.setCustomValidity(HashtagMessage.LONG);
-        textHashtags.style = 'border:1px solid red';
+        showError(HashtagMessage.LONG);
       } else {
         textHashtags.style = '';
       }
