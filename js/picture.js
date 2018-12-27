@@ -9,18 +9,21 @@
   var filterPopular = document.querySelector('#filter-popular');
   var filterNew = document.querySelector('#filter-new');
   var filterDiscussed = document.querySelector('#filter-discussed');
-  var pictures = [];
 
 
   // Удаляем фотографии из разметки
   var removePictures = function () {
-    while (picturesList.querySelector('.picture')) {
-      picturesList.removeChild(picturesList.querySelector('.picture'));
-    }
+    var photos = picturesList.querySelectorAll('.picture');
+    var photo;
+
+    photos.forEach(function (elem, index, array) {
+      photo = array[index];
+      picturesList.removeChild(photo);
+    });
   };
 
 
-  // Сортируем фотки по количеству комментариев
+  // Сортируем фотографии по количеству комментариев
   var sortPictures = function (array) {
     var arrayCopy = array.slice();
     arrayCopy.sort(function (first, second) {
@@ -37,7 +40,7 @@
   };
 
 
-  // Создаём болванку для превьюшки
+  // Создаём болванку для превью фотографии
   var getPicture = function (picture) {
     var pictureElement = pictureTemplate.cloneNode(true);
 
@@ -49,7 +52,7 @@
   };
 
 
-  // Отрисовываем фотки
+  // Отрисовываем фотографии
   var renderPictures = function (array, length) {
     var fragment = document.createDocumentFragment();
 
@@ -69,53 +72,57 @@
   };
 
 
+  // Показываем, какой фильтр выбран
+  var activateButton = function (evt) {
+    document.querySelectorAll('.img-filters__button').forEach(function (elem) {
+      elem.classList.remove('img-filters__button--active');
+    });
+
+    evt.target.classList.add('img-filters__button--active');
+  };
+
+
+  // Показываем популярные фотографии
+  var onFilterPopularClick = window.debounce(function (evt) {
+    activateButton(evt);
+    window.backend.downLoad(onSuccsessDownload, onErrorDownload);
+  });
+
+
+  // Показываем обсуждаемые фотографии
+  var showDiscussedPictures = function (array) {
+    var newArray = sortPictures(array);
+
+    removePictures();
+    renderPictures(newArray, newArray.length);
+  };
+
+  var onFilterDiscussedClick = window.debounce(function (evt) {
+    activateButton(evt);
+    window.backend.downLoad(showDiscussedPictures, onErrorDownload);
+  });
+
+
+  // Показываем новые фотографии
+  var showNewPictures = function (array) {
+    var newArray = window.util.shuffleArray(array);
+
+    removePictures();
+    renderPictures(newArray, NEW_PICTURES_COUNT);
+  };
+
+  var onFilterNewClick = window.debounce(function (evt) {
+    activateButton(evt);
+    window.backend.downLoad(showNewPictures, onErrorDownload);
+  });
+
+
   // Успешное выполнение запроса
   var onSuccsessDownload = function (array) {
     removePictures();
     renderPictures(array, array.length);
 
     document.querySelector('.img-filters').classList.remove('img-filters--inactive');
-  };
-
-  var onFilterPopularClick = function () {
-    filterPopular.classList.add('img-filters__button--active');
-    filterNew.classList.remove('img-filters__button--active');
-    filterDiscussed.classList.remove('img-filters__button--active');
-    window.backend.downLoad(onSuccsessDownload, onErrorDownload);
-  };
-
-  // Показываем обсуждаемые фотографии
-  var showDiscussedPictures = function (array) {
-    removePictures();
-
-    pictures = array;
-    var newArray = sortPictures(pictures);
-
-    renderPictures(newArray, newArray.length);
-  };
-
-  var onFilterDiscussedClick = function () {
-    filterDiscussed.classList.add('img-filters__button--active');
-    filterNew.classList.remove('img-filters__button--active');
-    filterPopular.classList.remove('img-filters__button--active');
-    window.backend.downLoad(showDiscussedPictures, onErrorDownload);
-  };
-
-  // Показываем новые фотографии
-  var showNewPictures = function (array) {
-    removePictures();
-
-    pictures = array;
-    var newArray = window.util.shuffleArray(pictures);
-
-    renderPictures(newArray, NEW_PICTURES_COUNT);
-  };
-
-  var onFilterNewClick = function () {
-    filterNew.classList.add('img-filters__button--active');
-    filterPopular.classList.remove('img-filters__button--active');
-    filterDiscussed.classList.remove('img-filters__button--active');
-    window.backend.downLoad(showNewPictures, onErrorDownload);
   };
 
 
@@ -132,6 +139,8 @@
     document.body.insertAdjacentElement('afterbegin', node);
   };
 
+
+  // Получаем данные о фотографиях
   window.backend.downLoad(onSuccsessDownload, onErrorDownload);
 
 

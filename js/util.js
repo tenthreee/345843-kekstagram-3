@@ -44,11 +44,21 @@
     return duplicate;
   };
 
+
+  // Выполняем что-то по нажатию на какую-то кнопку
+  var checkKeyCodeForAction = function (evt, key, action) {
+    if (evt.keyCode === key) {
+      action();
+    }
+  };
+
+
   window.util = {
     getRandomNumber: getRandomNumber,
     swapElements: swapElements,
     shuffleArray: shuffleArray,
     searchDuplicate: searchDuplicate,
+    checkKeyCodeForAction: checkKeyCodeForAction,
     Keycode: Keycode
   };
 

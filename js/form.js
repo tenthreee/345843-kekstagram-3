@@ -61,9 +61,9 @@
   };
 
   var HashtagMessage = {
-    TOOMANY: 'Нельзя указать больше пяти хэш-тегов',
+    TOO_MANY: 'Нельзя указать больше пяти хэш-тегов',
     SAME: 'Один и тот же хэш-тег не может быть использован дважды',
-    NOTHASH: 'Хэш-тег должен начинаться с символа #',
+    NOT_HASH: 'Хэш-тег должен начинаться с символа #',
     SHORT: 'Хэш-тег не может состоять только из одного символа',
     LONG: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку'
   };
@@ -101,6 +101,16 @@
     if (focused !== textDescription && focused !== textHashtags) {
       imgUpload.classList.add('hidden');
       form.reset();
+
+      document.removeEventListener('keydown', onImgUploadEscKeydown);
+      uploadCancel.removeEventListener('click', onUploadCancelClick);
+      uploadCancel.removeEventListener('keydown', onUploadCancelEnterKeydown);
+      effectsList.removeEventListener('click', onEffecstListClick);
+      scaleControlSmaller.removeEventListener('click', onScaleControlSmallerClick);
+      scaleControlBigger.removeEventListener('click', onScaleControlBiggerClick);
+      uploadSubmit.removeEventListener('click', validateHashtags);
+      form.removeEventListener('submit', onUploadSubmitClick);
+      textHashtags.removeEventListener('input', onTextHashtagsInput);
     }
   };
 
@@ -109,65 +119,67 @@
   };
 
   var onUploadCancelEnterKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ENTER) {
-      closeImgUpload();
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeImgUpload);
   };
 
   var onImgUploadEscKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ESC) {
-      closeImgUpload();
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeImgUpload);
+  };
+
+
+  // Показываем модалки
+  var showModal = function (template, modal, button) {
+    closeImgUpload();
+    var message = template.cloneNode(true);
+
+    main.appendChild(message);
+    document.querySelector(button).addEventListener('click', onSuccessButtonClick);
+    document.querySelector(button).addEventListener('keydown', onSuccessButtonEnterKeydown);
+    document.addEventListener('keydown', onSuccessEscKeydown);
+    document.querySelector(modal).addEventListener('click', onSuccessClick);
   };
 
 
   // Закрываем модалки
-  var closeSuccess = function () {
-    main.removeChild(document.querySelector('.success'));
-  };
+  var closeModal = function (modal, button) {
+    main.removeChild(document.querySelector(modal));
 
-  var closeError = function () {
-    main.removeChild(document.querySelector('.error'));
+    document.querySelector(button).removeEventListener('click', onErrorButtonClick);
+    document.querySelector(button).removeEventListener('keydown', onErrorButtonEnterKeydown);
+    document.removeEventListener('keydown', onErrorEscKeydown);
+    document.querySelector(modal).removeEventListener('click', onErrorClick);
   };
 
   var onSuccessButtonClick = function () {
-    closeSuccess();
+    closeModal('.success', '.success__button');
   };
 
   var onErrorButtonClick = function () {
-    closeError();
+    closeModal('.error', '.error__button');
   };
 
   var onSuccessButtonEnterKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ENTER) {
-      closeSuccess();
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeModal('.success', '.success__button'));
   };
 
   var onErrorButtonEnterKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ENTER) {
-      closeError();
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeModal('.error', '.error__button'));
   };
 
   var onSuccessEscKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ESC) {
-      closeSuccess();
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeModal('.success', '.success__button'));
   };
 
   var onErrorEscKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ESC) {
-      closeError();
-    }
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeModal('.error', '.error__button'));
   };
 
   var onSuccessClick = function () {
-    closeSuccess();
+    closeModal('.success', '.success__button');
   };
 
   var onErrorClick = function () {
-    closeError();
+    closeModal('.error', '.error__button');
   };
 
 
@@ -179,6 +191,7 @@
     effectLevelDepth.setAttribute('style', 'width:100%');
     effectLevelPin.setAttribute('style', 'left:100%');
     effectLevelValue.setAttribute('value', '100');
+    scaleControlValue.setAttribute('value', '100%');
   };
 
 
@@ -187,12 +200,30 @@
     imgUpload.classList.remove('hidden');
     effectLevel.classList.add('hidden');
     resetEffect();
-    scaleControlValue.setAttribute('value', '100%'); // Делаем значение поля по умолчанию 100% (ТЗ 2.1)
+
     document.addEventListener('keydown', onImgUploadEscKeydown);
+    uploadCancel.addEventListener('click', onUploadCancelClick);
+    uploadCancel.addEventListener('keydown', onUploadCancelEnterKeydown);
+    effectsList.addEventListener('click', onEffecstListClick);
+    scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
+    scaleControlBigger.addEventListener('click', onScaleControlBiggerClick);
+    uploadSubmit.addEventListener('click', validateHashtags);
+    form.addEventListener('submit', onUploadSubmitClick);
+    textHashtags.addEventListener('input', onTextHashtagsInput);
+  };
+
+  var onTextHashtagsInput = function () {
+    textHashtags.setCustomValidity('');
   };
 
 
   // Применяем эффекты к фоточке
+  var setEffect = function (effect) {
+    resetEffect();
+    effectLevel.classList.remove('hidden');
+    imgPreview.classList.add('effects__preview--' + effect);
+  };
+
   var switchEffects = function () {
     var effect = effectsList.querySelector('input[type=radio]:checked');
 
@@ -202,29 +233,19 @@
         effectLevel.classList.add('hidden');
         break;
       case 'effect-chrome':
-        resetEffect();
-        effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + ImgEffect.CHROME.name);
+        setEffect(ImgEffect.CHROME.name);
         break;
       case 'effect-sepia':
-        resetEffect();
-        effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + ImgEffect.SEPIA.name);
+        setEffect(ImgEffect.SEPIA.name);
         break;
       case 'effect-marvin':
-        resetEffect();
-        effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + ImgEffect.MARVIN.name);
+        setEffect(ImgEffect.MARVIN.name);
         break;
       case 'effect-phobos':
-        resetEffect();
-        effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + ImgEffect.PHOBOS.name);
+        setEffect(ImgEffect.PHOBOS.name);
         break;
       case 'effect-heat':
-        resetEffect();
-        effectLevel.classList.remove('hidden');
-        imgPreview.classList.add('effects__preview--' + ImgEffect.HEAT.name);
+        setEffect(ImgEffect.HEAT.name);
         break;
     }
   };
@@ -233,45 +254,64 @@
     switchEffects();
   };
 
-  // Уменьшаем фоточку
+
+  // Прописываем уровень фильтра
+  var setFilterValue = function (filter, value, units) {
+    if (units) {
+      return 'filter:' + filter + '(' + value + units + ')';
+    }
+
+    return 'filter:' + filter + '(' + value + ')';
+  };
+
+
+  // Меняем масштаб фоточки
+  var setScale = function (value) {
+    if (value >= 100) {
+      imgPreview.removeAttribute('style');
+      scaleControlValue.value = value + '%';
+    } else {
+      imgPreview.setAttribute('style', 'transform:scale(0.' + value + ')');
+      scaleControlValue.value = value + '%';
+    }
+  };
+
   var onScaleControlSmallerClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
     if (value > Scale.MIN) {
       value -= Scale.STEP;
-      imgPreview.setAttribute('style', 'transform:scale(0.' + value + ')');
-      scaleControlValue.value = value + '%';
+      setScale(value);
     } else if (value <= Scale.MIN) {
-      imgPreview.setAttribute('style', 'transform:scale(0.25)');
-      scaleControlValue.value = value + '%';
+      setScale(Scale.MIN);
     }
   };
 
-
-  // Увеличиваем фоточку
   var onScaleControlBiggerClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
     if (value < Scale.MAX - Scale.STEP) {
       value += Scale.STEP;
-      imgPreview.setAttribute('style', 'transform:scale(0.' + value + ')');
-      scaleControlValue.value = value + '%';
+      setScale(value);
     } else if (value >= Scale.MAX - Scale.STEP && value < Scale.MAX) {
       value += Scale.STEP;
-      imgPreview.removeAttribute('style');
-      scaleControlValue.value = value + '%';
+      setScale(value);
     }
   };
 
 
   // Валидируем хэштеги
+  var showValidationError = function (message) {
+    textHashtags.setCustomValidity(message);
+    textHashtags.style = 'border:1px solid red';
+  };
+
   var validateHashtags = function () {
     var userHashtags = document.querySelector('.text__hashtags').value;
     var splitHashtags = userHashtags.split(' ');
 
     if (splitHashtags.length > Hashtag.MAX_NUMBER) {
-      textHashtags.setCustomValidity(HashtagMessage.TOOMANY);
-      textHashtags.style = 'border:1px solid red';
+      showValidationError(HashtagMessage.TOO_MANY);
     }
 
     for (var i = 0; i < splitHashtags.length; i++) {
@@ -279,75 +319,21 @@
       var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
 
       if (sameHashtags > 1) {
-        textHashtags.setCustomValidity(HashtagMessage.SAME);
-        textHashtags.style = 'border:1px solid red';
+        showValidationError(HashtagMessage.SAME);
       }
       if (currentHashtag[0] !== '#') {
-        textHashtags.setCustomValidity(HashtagMessage.NOTHASH);
-        textHashtags.style = 'border:1px solid red';
+        showValidationError(HashtagMessage.NOT_HASH);
       }
       if (currentHashtag.length < Hashtag.MIN_LENGTH) {
-        textHashtags.setCustomValidity(HashtagMessage.SHORT);
-        textHashtags.style = 'border:1px solid red';
+        showValidationError(HashtagMessage.SHORT);
       }
       if (currentHashtag.length > Hashtag.MAX_LENGTH) {
-        textHashtags.setCustomValidity(HashtagMessage.LONG);
-        textHashtags.style = 'border:1px solid red';
+        showValidationError(HashtagMessage.LONG);
       } else {
         textHashtags.style = '';
       }
     }
   };
-
-  // Отправляем данные из формы
-  var onUploadSubmitClick = function (evt) {
-    validateHashtags();
-
-    window.backend.upLoad(new FormData(form), onSuccsessUpload, onErrorUpload);
-    evt.preventDefault();
-  };
-
-  var onSuccsessUpload = function () {
-    closeImgUpload();
-    var successMessage = success.cloneNode(true);
-
-    main.appendChild(successMessage);
-    document.querySelector('.success__button').addEventListener('click', onSuccessButtonClick);
-    document.querySelector('.success__button').addEventListener('keydown', onSuccessButtonEnterKeydown);
-    document.addEventListener('keydown', onSuccessEscKeydown);
-    document.querySelector('.success').addEventListener('click', onSuccessClick);
-  };
-
-  var onErrorUpload = function () {
-    closeImgUpload();
-    var errorMessage = error.cloneNode(true);
-
-    main.appendChild(errorMessage);
-    document.querySelector('.error__button').addEventListener('click', onErrorButtonClick);
-    document.querySelector('.error__button').addEventListener('keydown', onErrorButtonEnterKeydown);
-    document.addEventListener('keydown', onErrorEscKeydown);
-    document.querySelector('.error').addEventListener('click', onErrorClick);
-  };
-
-
-  // Накидываем обработчики
-  fileUpload.addEventListener('change', onFileUploadChange);
-  uploadCancel.addEventListener('click', onUploadCancelClick);
-  uploadCancel.addEventListener('keydown', onUploadCancelEnterKeydown);
-  effectsList.addEventListener('click', onEffecstListClick);
-  scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
-  scaleControlBigger.addEventListener('click', onScaleControlBiggerClick);
-  uploadSubmit.addEventListener('click', validateHashtags);
-  form.addEventListener('submit', onUploadSubmitClick);
-
-
-  // — Нам точно это нужно делать при каждом срабатывании input?
-  //
-  // — Видимо, нет, раз ты спрашиваешь :) Меня устроило, как в этой реализации
-  // появлялись сообщения, на ней я и остановилась :D
-  textHashtags.addEventListener('input', function () {
-    textHashtags.setCustomValidity('');
-  });
 
 
   // Двигаем пин
@@ -399,15 +385,6 @@
       }
     };
 
-    // Ставим фильтр
-    var setFilterValue = function (filter, value, units) {
-      if (units) {
-        return 'filter:' + filter + '(' + value + units + ')';
-      }
-
-      return 'filter:' + filter + '(' + value + ')';
-    };
-
     var onPinMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
@@ -419,4 +396,24 @@
     document.addEventListener('mouseup', onPinMouseUp);
   });
 
+
+  // Отправляем данные из формы
+  var onSuccsessUpload = function () {
+    showModal(success, '.success', '.success__button');
+  };
+
+  var onErrorUpload = function () {
+    showModal(error, '.error', '.error__button');
+  };
+
+  var onUploadSubmitClick = function (evt) {
+    validateHashtags();
+
+    window.backend.upLoad(new FormData(form), onSuccsessUpload, onErrorUpload);
+    evt.preventDefault();
+  };
+
+
+  // Накидываем обработчики
+  fileUpload.addEventListener('change', onFileUploadChange);
 })();
