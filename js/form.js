@@ -190,10 +190,10 @@
     imgPreview.style = '';
     imgPreview.className = '';
 
-    effectLevelDepth.setAttribute('style', 'width:100%');
-    effectLevelPin.setAttribute('style', 'left:100%');
-    effectLevelValue.setAttribute('value', '100');
-    scaleControlValue.setAttribute('value', '100%');
+    effectLevelDepth.style.width = '100%';
+    effectLevelPin.style.left = '100%';
+    effectLevelValue.value = '100';
+    scaleControlValue.value = '100%';
   };
 
 
@@ -277,22 +277,22 @@
   // Прописываем уровень фильтра
   var setFilterValue = function (filter, value, units) {
     if (units) {
-      return 'filter:' + filter + '(' + value + units + ')';
+      return filter + '(' + value + units + ')';
     }
 
-    return 'filter:' + filter + '(' + value + ')';
+    return filter + '(' + value + ')';
   };
 
 
   // Меняем масштаб фоточки
   var setScale = function (value) {
+    imgPreview.style.transform = 'scale(0.' + value + ')';
+
     if (value >= 100) {
-      imgPreview.removeAttribute('style');
-      scaleControlValue.value = value + '%';
-    } else {
-      imgPreview.setAttribute('style', 'transform:scale(0.' + value + ')');
-      scaleControlValue.value = value + '%';
+      imgPreview.style = '';
     }
+
+    scaleControlValue.value = value + '%';
   };
 
   var onScaleControlSmallerClick = function () {
@@ -378,28 +378,28 @@
 
       // Меняем глубину эффекта при перемещнии пина
       var level = effectLevelPinLeft;
-      effectLevelValue.setAttribute('value', level);
+      effectLevelValue.value = level;
       var filterValue = level / EffectValue.MAX;
       var effect = effectsList.querySelector('input[type=radio]:checked');
 
       switch (effect.id) {
         case 'effect-chrome':
-          imgPreview.setAttribute('style', setFilterValue(ImgEffect.CHROME.filter, filterValue));
+          imgPreview.style.filter = setFilterValue(ImgEffect.CHROME.filter, filterValue);
           break;
         case 'effect-sepia':
-          imgPreview.setAttribute('style', setFilterValue(ImgEffect.SEPIA.filter, filterValue));
+          imgPreview.style.filter = setFilterValue(ImgEffect.SEPIA.filter, filterValue);
           break;
         case 'effect-marvin':
           filterValue = level;
-          imgPreview.setAttribute('style', setFilterValue(ImgEffect.MARVIN.filter, filterValue, ImgEffect.MARVIN.unit));
+          imgPreview.style.filter = setFilterValue(ImgEffect.MARVIN.filter, filterValue, ImgEffect.MARVIN.unit);
           break;
         case 'effect-phobos':
           filterValue = level * ImgEffect.PHOBOS.max / EffectValue.MAX;
-          imgPreview.setAttribute('style', setFilterValue(ImgEffect.PHOBOS.filter, filterValue, ImgEffect.PHOBOS.unit));
+          imgPreview.style.filter = setFilterValue(ImgEffect.PHOBOS.filter, filterValue, ImgEffect.PHOBOS.unit);
           break;
         case 'effect-heat':
           filterValue = level * ImgEffect.HEAT.max / EffectValue.MAX; // Не понимаю, как правильно посчитать значение для этого фильтра. И вообще нужна какая-то универсальная функция для подсчёта, наверное
-          imgPreview.setAttribute('style', setFilterValue(ImgEffect.HEAT.filter, filterValue));
+          imgPreview.style.filter = setFilterValue(ImgEffect.HEAT.filter, filterValue);
           break;
       }
     };
