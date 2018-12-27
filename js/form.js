@@ -68,6 +68,8 @@
     LONG: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку'
   };
 
+  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+
   var picturesList = document.querySelector('.pictures');
   var form = picturesList.querySelector('.img-upload__form');
   var fileUpload = picturesList.querySelector('#upload-file');
@@ -197,6 +199,23 @@
 
   // Открываем форму редактирования изображения
   var onFileUploadChange = function () {
+    var file = fileUpload.files[0];
+    var fileName = file.name.toLowerCase();
+
+    var matches = FILE_TYPES.some(function (it) {
+      return fileName.endsWith(it);
+    });
+
+    if (matches) {
+      var reader = new FileReader();
+
+      reader.addEventListener('load', function () {
+        imgPreview.src = reader.result;
+      });
+
+      reader.readAsDataURL(file);
+    }
+
     imgUpload.classList.remove('hidden');
     effectLevel.classList.add('hidden');
     resetEffect();
