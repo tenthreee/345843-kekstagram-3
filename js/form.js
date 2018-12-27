@@ -92,8 +92,10 @@
   var main = document.querySelector('main');
   var successTemplate = document.querySelector('#success');
   var success = successTemplate.content.querySelector('.success');
+  var successButton = successTemplate.content.querySelector('.success__button');
   var errorTemplate = document.querySelector('#error');
   var error = errorTemplate.content.querySelector('.error');
+  var errorButton = errorTemplate.content.querySelector('.error__button');
 
 
   // Закрываем форму редактирования изображения
@@ -130,58 +132,64 @@
 
 
   // Показываем модалки
-  var showModal = function (template, modal, button) {
+  var showSuccessModal = function () {
     closeImgUpload();
-    var message = template.cloneNode(true);
+    var message = success.cloneNode(true);
 
     main.appendChild(message);
-    document.querySelector(button).addEventListener('click', onSuccessButtonClick);
-    document.querySelector(button).addEventListener('keydown', onSuccessButtonEnterKeydown);
+    successButton.addEventListener('click', onSuccessButtonClick);
+    successButton.addEventListener('keydown', onSuccessButtonEnterKeydown);
     document.addEventListener('keydown', onSuccessEscKeydown);
-    document.querySelector(modal).addEventListener('click', onSuccessClick);
+    document.querySelector('.success').addEventListener('click', onSuccessClick);
+  };
+
+  var showErrorModal = function () {
+    closeImgUpload();
+    var message = error.cloneNode(true);
+
+    main.appendChild(message);
+    errorButton.addEventListener('click', onErrorButtonClick);
+    errorButton.addEventListener('keydown', onErrorButtonEnterKeydown);
+    document.addEventListener('keydown', onErrorEscKeydown);
+    document.querySelector('.error').addEventListener('click', onErrorClick);
   };
 
 
   // Закрываем модалки
-  var closeModal = function (modal, button) {
+  var closeModal = function (modal) {
     main.removeChild(document.querySelector(modal));
-
-    document.querySelector(button).removeEventListener('click', onErrorButtonClick);
-    document.querySelector(button).removeEventListener('keydown', onErrorButtonEnterKeydown);
-    document.removeEventListener('keydown', onErrorEscKeydown);
-    document.querySelector(modal).removeEventListener('click', onErrorClick);
   };
 
   var onSuccessButtonClick = function () {
-    closeModal('.success', '.success__button');
+    closeModal('.success');
   };
 
   var onErrorButtonClick = function () {
-    closeModal('.error', '.error__button');
+    closeModal('.error');
   };
 
   var onSuccessButtonEnterKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeModal('.success', '.success__button'));
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeModal('.success'));
   };
 
   var onErrorButtonEnterKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeModal('.error', '.error__button'));
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeModal('.error'));
   };
 
   var onSuccessEscKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeModal('.success', '.success__button'));
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeModal('.success'));
   };
 
   var onErrorEscKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeModal('.error', '.error__button'));
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeModal('.error'));
   };
 
   var onSuccessClick = function () {
-    closeModal('.success', '.success__button');
+    closeModal('.success');
   };
 
   var onErrorClick = function () {
-    closeModal('.error', '.error__button');
+    closeModal('.error');
   };
 
 
@@ -418,11 +426,11 @@
 
   // Отправляем данные из формы
   var onSuccsessUpload = function () {
-    showModal(success, '.success', '.success__button');
+    showSuccessModal();
   };
 
   var onErrorUpload = function () {
-    showModal(error, '.error', '.error__button');
+    showErrorModal();
   };
 
   var onUploadSubmitClick = function (evt) {
