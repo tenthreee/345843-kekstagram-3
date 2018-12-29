@@ -295,7 +295,7 @@
   var setScale = function (value) {
     imgPreview.style.transform = 'scale(0.' + value + ')';
 
-    if (value >= 100) {
+    if (value >= Scale.Max) {
       imgPreview.style = '';
     }
 
