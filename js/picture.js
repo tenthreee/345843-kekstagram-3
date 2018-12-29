@@ -6,9 +6,10 @@
   var picturesList = document.querySelector('.pictures');
   var template = document.querySelector('#picture');
   var pictureTemplate = template.content.querySelector('.picture');
-  var filterPopular = document.querySelector('#filter-popular');
-  var filterNew = document.querySelector('#filter-new');
-  var filterDiscussed = document.querySelector('#filter-discussed');
+  var imgFilters = document.querySelector('.img-filters');
+  var filterPopular = imgFilters.querySelector('#filter-popular');
+  var filterNew = imgFilters.querySelector('#filter-new');
+  var filterDiscussed = imgFilters.querySelector('#filter-discussed');
 
 
   // Удаляем фотографии из разметки
@@ -122,7 +123,7 @@
     removePictures();
     renderPictures(array, array.length);
 
-    document.querySelector('.img-filters').classList.remove('img-filters--inactive');
+    imgFilters.classList.remove('img-filters--inactive');
   };
 
 

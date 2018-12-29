@@ -197,7 +197,6 @@
   var resetEffect = function () {
     imgPreview.style = '';
     imgPreview.className = '';
-
     effectLevelDepth.style.width = '100%';
     effectLevelPin.style.left = '100%';
     effectLevelValue.value = '100';
@@ -309,18 +308,13 @@
     if (value > Scale.MIN) {
       value -= Scale.STEP;
       setScale(value);
-    } else if (value <= Scale.MIN) {
-      setScale(Scale.MIN);
     }
   };
 
   var onScaleControlBiggerClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
-    if (value < Scale.MAX - Scale.STEP) {
-      value += Scale.STEP;
-      setScale(value);
-    } else if (value >= Scale.MAX - Scale.STEP && value < Scale.MAX) {
+    if (value < Scale.MAX) {
       value += Scale.STEP;
       setScale(value);
     }
@@ -406,7 +400,7 @@
           imgPreview.style.filter = setFilterValue(ImgEffect.PHOBOS.filter, filterValue, ImgEffect.PHOBOS.unit);
           break;
         case 'effect-heat':
-          filterValue = level * ImgEffect.HEAT.max / EffectValue.MAX; // Не понимаю, как правильно посчитать значение для этого фильтра. И вообще нужна какая-то универсальная функция для подсчёта, наверное
+          filterValue = level * ImgEffect.HEAT.max / EffectValue.MAX;
           imgPreview.style.filter = setFilterValue(ImgEffect.HEAT.filter, filterValue);
           break;
       }
