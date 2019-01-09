@@ -68,8 +68,6 @@
     LONG: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку'
   };
 
-  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
-
   var picturesList = document.querySelector('.pictures');
   var form = picturesList.querySelector('.img-upload__form');
   var fileUpload = picturesList.querySelector('#upload-file');
@@ -206,23 +204,7 @@
 
   // Открываем форму редактирования изображения
   var onFileUploadChange = function () {
-    var file = fileUpload.files[0];
-    var fileName = file.name.toLowerCase();
-
-    var matches = FILE_TYPES.some(function (it) {
-      return fileName.endsWith(it);
-    });
-
-    if (matches) {
-      var reader = new FileReader();
-
-      reader.addEventListener('load', function () {
-        imgPreview.src = reader.result;
-      });
-
-      reader.readAsDataURL(file);
-    }
-
+    window.photo.getUserPhoto();
     imgUpload.classList.remove('hidden');
     effectLevel.classList.add('hidden');
     resetEffect();
@@ -293,12 +275,7 @@
 
   // Меняем масштаб фоточки
   var setScale = function (value) {
-    imgPreview.style.transform = 'scale(0.' + value + ')';
-
-    if (value >= Scale.Max) {
-      imgPreview.style = '';
-    }
-
+    imgPreview.style.transform = 'scale(' + value / 100 + ')';
     scaleControlValue.value = value + '%';
   };
 
@@ -329,29 +306,32 @@
 
   var validateHashtags = function () {
     var userHashtags = document.querySelector('.text__hashtags').value;
-    var splitHashtags = userHashtags.split(' ');
 
-    if (splitHashtags.length > Hashtag.MAX_NUMBER) {
-      showValidationError(HashtagMessage.TOO_MANY);
-    }
+    if (userHashtags) {
+      var splitHashtags = userHashtags.split(' ');
 
-    for (var i = 0; i < splitHashtags.length; i++) {
-      var currentHashtag = splitHashtags[i].toLowerCase();
-      var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
+      if (splitHashtags.length > Hashtag.MAX_NUMBER) {
+        showValidationError(HashtagMessage.TOO_MANY);
+      }
 
-      if (sameHashtags > 1) {
-        showValidationError(HashtagMessage.SAME);
-      }
-      if (currentHashtag[0] !== '#') {
-        showValidationError(HashtagMessage.NOT_HASH);
-      }
-      if (currentHashtag.length < Hashtag.MIN_LENGTH) {
-        showValidationError(HashtagMessage.SHORT);
-      }
-      if (currentHashtag.length > Hashtag.MAX_LENGTH) {
-        showValidationError(HashtagMessage.LONG);
-      } else {
-        textHashtags.style = '';
+      for (var i = 0; i < splitHashtags.length; i++) {
+        var currentHashtag = splitHashtags[i].toLowerCase();
+        var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
+
+        if (sameHashtags > 1) {
+          showValidationError(HashtagMessage.SAME);
+        }
+        if (currentHashtag[0] !== '#') {
+          showValidationError(HashtagMessage.NOT_HASH);
+        }
+        if (currentHashtag.length < Hashtag.MIN_LENGTH) {
+          showValidationError(HashtagMessage.SHORT);
+        }
+        if (currentHashtag.length > Hashtag.MAX_LENGTH) {
+          showValidationError(HashtagMessage.LONG);
+        } else {
+          textHashtags.style = '';
+        }
       }
     }
   };
@@ -437,4 +417,10 @@
 
   // Накидываем обработчики
   fileUpload.addEventListener('change', onFileUploadChange);
+
+  window.form = {
+    fileUpload: fileUpload,
+    imgPreview: imgPreview
+  };
+
 })();
