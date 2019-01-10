@@ -420,7 +420,9 @@
 
   window.form = {
     fileUpload: fileUpload,
-    imgPreview: imgPreview
+    imgPreview: imgPreview,
+    error: error,
+    main: main
   };
 
 })();

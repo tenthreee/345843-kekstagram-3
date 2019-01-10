@@ -10,6 +10,7 @@
   var filterPopular = imgFilters.querySelector('#filter-popular');
   var filterNew = imgFilters.querySelector('#filter-new');
   var filterDiscussed = imgFilters.querySelector('#filter-discussed');
+  var picturesData = [];
 
 
   // Удаляем фотографии из разметки
@@ -86,7 +87,7 @@
   // Показываем популярные фотографии
   var onFilterPopularClick = window.debounce(function (evt) {
     activateButton(evt);
-    window.backend.downLoad(onSuccsessDownload, onErrorDownload);
+    onSuccsessDownload(picturesData);
   });
 
 
@@ -100,7 +101,7 @@
 
   var onFilterDiscussedClick = window.debounce(function (evt) {
     activateButton(evt);
-    window.backend.downLoad(showDiscussedPictures, onErrorDownload);
+    showDiscussedPictures(picturesData);
   });
 
 
@@ -114,12 +115,14 @@
 
   var onFilterNewClick = window.debounce(function (evt) {
     activateButton(evt);
-    window.backend.downLoad(showNewPictures, onErrorDownload);
+    showNewPictures(picturesData);
   });
 
 
   // Успешное выполнение запроса
   var onSuccsessDownload = function (array) {
+    picturesData = array;
+
     removePictures();
     renderPictures(array, array.length);
 
@@ -129,15 +132,11 @@
 
   // Неуспешное выполнение запроса
   var onErrorDownload = function (errorMessage) {
-    var node = document.createElement('div');
-    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
-    node.style.position = 'absolute';
-    node.style.left = 0;
-    node.style.right = 0;
-    node.style.fontSize = '30px';
+    var message = window.form.error.cloneNode(true);
 
-    node.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', node);
+    window.form.main.appendChild(message);
+    document.querySelector('.error__inner').removeChild(document.querySelector('.error__buttons'));
+    document.querySelector('.error__title').textContent = errorMessage;
   };
 
 

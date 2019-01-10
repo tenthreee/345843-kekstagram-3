@@ -77,6 +77,33 @@
     commentsList.appendChild(fragment);
   };
 
+  var addMoreComments = function (picture) {
+    var fragment = document.createDocumentFragment();
+    var addedComments = document.querySelectorAll('.social__comment');
+    var comments = picture.comments;
+
+    if (comments.length - addedComments.length >= COMMENTS_COUNT) {
+      for (var i = addedComments.length; i < addedComments.length + COMMENTS_COUNT; i++) {
+        var comment = comments[i];
+        fragment.appendChild(createComment(comment));
+      }
+
+      socialCommentCount.innerHTML = addedComments.length + ' из <span class="comments-count">' + comments.length + '</span> комментариев';
+    }
+
+    if (comments.length - addedComments.length < COMMENTS_COUNT) {
+      for (var j = addedComments.length; j < comments.length; j++) {
+        comment = comments[j];
+        fragment.appendChild(createComment(comment));
+      }
+
+      socialCommentLoad.classList.add('visually-hidden');
+      socialCommentCount.innerHTML = comments.length + ' из <span class="comments-count">' + comments.length + '</span> комментариев';
+    }
+
+    commentsList.appendChild(fragment);
+  };
+
 
   // Заполняем и показываем большую фоточку
   var fillOverlay = function (picture) {
@@ -96,6 +123,9 @@
     } else {
       socialCommentCount.innerHTML = COMMENTS_COUNT + ' из <span class="comments-count">' + picture.comments.length + '</span> комментариев';
       socialCommentLoad.classList.remove('visually-hidden');
+      socialCommentLoad.addEventListener('click', function () {
+        addMoreComments(picture);
+      });
     }
 
     document.addEventListener('keydown', onBigPictureEscKeydown);
