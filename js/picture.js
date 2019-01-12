@@ -16,11 +16,9 @@
   // Удаляем фотографии из разметки
   var removePictures = function () {
     var photos = picturesList.querySelectorAll('.picture');
-    var photo;
 
-    photos.forEach(function (elem, index, array) {
-      photo = array[index];
-      picturesList.removeChild(photo);
+    photos.forEach(function (elem) {
+      picturesList.removeChild(elem);
     });
   };
 
@@ -55,20 +53,20 @@
 
 
   // Отрисовываем фотографии
-  var renderPictures = function (array, length) {
+  var renderPictures = function (array) {
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < length; i++) {
-      var currentPicture = getPicture(array[i]);
+    array.forEach(function (picture, index) {
+      var currentPicture = getPicture(picture);
 
-      currentPicture.dataset.id = i;
+      currentPicture.dataset.id = index;
       fragment.appendChild(currentPicture);
 
       currentPicture.addEventListener('click', function (evt) {
         evt.preventDefault();
         window.preview.fillOverlay(array[evt.currentTarget.dataset.id]);
       });
-    }
+    });
 
     picturesList.appendChild(fragment);
   };
@@ -96,7 +94,7 @@
     var newArray = sortPictures(array);
 
     removePictures();
-    renderPictures(newArray, newArray.length);
+    renderPictures(newArray);
   };
 
   var onFilterDiscussedClick = window.debounce(function (evt) {
@@ -110,7 +108,7 @@
     var newArray = window.util.shuffleArray(array);
 
     removePictures();
-    renderPictures(newArray, NEW_PICTURES_COUNT);
+    renderPictures(newArray.slice(0, NEW_PICTURES_COUNT));
   };
 
   var onFilterNewClick = window.debounce(function (evt) {
@@ -121,10 +119,10 @@
 
   // Успешное выполнение запроса
   var onSuccsessDownload = function (array) {
-    picturesData = array;
+    picturesData = array.slice(); // сделать копию слайсом
 
     removePictures();
-    renderPictures(array, array.length);
+    renderPictures(array);
 
     imgFilters.classList.remove('img-filters--inactive');
   };

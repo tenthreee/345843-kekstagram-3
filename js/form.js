@@ -19,7 +19,12 @@
   };
 
   var ImgEffect = {
+    NONE: {
+      id: 'effect-none'
+    },
+
     CHROME: {
+      id: 'effect-chrome',
       name: 'chrome',
       filter: 'grayscale',
       min: 0,
@@ -28,6 +33,7 @@
     },
 
     SEPIA: {
+      id: 'effect-sepia',
       name: 'sepia',
       filter: 'sepia',
       min: 0,
@@ -36,6 +42,7 @@
     },
 
     MARVIN: {
+      id: 'effect-marvin',
       name: 'marvin',
       filter: 'invert',
       min: 0,
@@ -44,6 +51,7 @@
     },
 
     PHOBOS: {
+      id: 'effect-phobos',
       name: 'phobos',
       filter: 'blur',
       min: 0,
@@ -52,6 +60,7 @@
     },
 
     HEAT: {
+      id: 'effect-heat',
       name: 'heat',
       filter: 'brightness',
       min: 1,
@@ -236,23 +245,23 @@
     var effect = effectsList.querySelector('input[type=radio]:checked');
 
     switch (effect.id) {
-      case 'effect-none':
+      case ImgEffect.NONE.id:
         imgPreview.className = '';
         effectLevel.classList.add('hidden');
         break;
-      case 'effect-chrome':
+      case ImgEffect.CHROME.id:
         setEffect(ImgEffect.CHROME.name);
         break;
-      case 'effect-sepia':
+      case ImgEffect.SEPIA.id:
         setEffect(ImgEffect.SEPIA.name);
         break;
-      case 'effect-marvin':
+      case ImgEffect.MARVIN.id:
         setEffect(ImgEffect.MARVIN.name);
         break;
-      case 'effect-phobos':
+      case ImgEffect.PHOBOS.id:
         setEffect(ImgEffect.PHOBOS.name);
         break;
-      case 'effect-heat':
+      case ImgEffect.HEAT.id:
         setEffect(ImgEffect.HEAT.name);
         break;
     }
@@ -365,21 +374,21 @@
       var effect = effectsList.querySelector('input[type=radio]:checked');
 
       switch (effect.id) {
-        case 'effect-chrome':
+        case ImgEffect.CHROME.id:
           imgPreview.style.filter = setFilterValue(ImgEffect.CHROME.filter, filterValue);
           break;
-        case 'effect-sepia':
+        case ImgEffect.SEPIA.id:
           imgPreview.style.filter = setFilterValue(ImgEffect.SEPIA.filter, filterValue);
           break;
-        case 'effect-marvin':
+        case ImgEffect.MARVIN.id:
           filterValue = level;
           imgPreview.style.filter = setFilterValue(ImgEffect.MARVIN.filter, filterValue, ImgEffect.MARVIN.unit);
           break;
-        case 'effect-phobos':
+        case ImgEffect.PHOBOS.id:
           filterValue = level * ImgEffect.PHOBOS.max / EffectValue.MAX;
           imgPreview.style.filter = setFilterValue(ImgEffect.PHOBOS.filter, filterValue, ImgEffect.PHOBOS.unit);
           break;
-        case 'effect-heat':
+        case ImgEffect.HEAT.id:
           filterValue = level * ImgEffect.HEAT.max / EffectValue.MAX;
           imgPreview.style.filter = setFilterValue(ImgEffect.HEAT.filter, filterValue);
           break;
