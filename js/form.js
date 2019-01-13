@@ -19,7 +19,12 @@
   };
 
   var ImgEffect = {
+    NONE: {
+      id: 'effect-none'
+    },
+
     CHROME: {
+      id: 'effect-chrome',
       name: 'chrome',
       filter: 'grayscale',
       min: 0,
@@ -28,6 +33,7 @@
     },
 
     SEPIA: {
+      id: 'effect-sepia',
       name: 'sepia',
       filter: 'sepia',
       min: 0,
@@ -36,6 +42,7 @@
     },
 
     MARVIN: {
+      id: 'effect-marvin',
       name: 'marvin',
       filter: 'invert',
       min: 0,
@@ -44,6 +51,7 @@
     },
 
     PHOBOS: {
+      id: 'effect-phobos',
       name: 'phobos',
       filter: 'blur',
       min: 0,
@@ -52,6 +60,7 @@
     },
 
     HEAT: {
+      id: 'effect-heat',
       name: 'heat',
       filter: 'brightness',
       min: 1,
@@ -67,8 +76,6 @@
     SHORT: 'Хэш-тег не может состоять только из одного символа',
     LONG: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку'
   };
-
-  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
 
   var picturesList = document.querySelector('.pictures');
   var form = picturesList.querySelector('.img-upload__form');
@@ -206,23 +213,7 @@
 
   // Открываем форму редактирования изображения
   var onFileUploadChange = function () {
-    var file = fileUpload.files[0];
-    var fileName = file.name.toLowerCase();
-
-    var matches = FILE_TYPES.some(function (it) {
-      return fileName.endsWith(it);
-    });
-
-    if (matches) {
-      var reader = new FileReader();
-
-      reader.addEventListener('load', function () {
-        imgPreview.src = reader.result;
-      });
-
-      reader.readAsDataURL(file);
-    }
-
+    window.photo.getUserPhoto();
     imgUpload.classList.remove('hidden');
     effectLevel.classList.add('hidden');
     resetEffect();
@@ -254,23 +245,23 @@
     var effect = effectsList.querySelector('input[type=radio]:checked');
 
     switch (effect.id) {
-      case 'effect-none':
+      case ImgEffect.NONE.id:
         imgPreview.className = '';
         effectLevel.classList.add('hidden');
         break;
-      case 'effect-chrome':
+      case ImgEffect.CHROME.id:
         setEffect(ImgEffect.CHROME.name);
         break;
-      case 'effect-sepia':
+      case ImgEffect.SEPIA.id:
         setEffect(ImgEffect.SEPIA.name);
         break;
-      case 'effect-marvin':
+      case ImgEffect.MARVIN.id:
         setEffect(ImgEffect.MARVIN.name);
         break;
-      case 'effect-phobos':
+      case ImgEffect.PHOBOS.id:
         setEffect(ImgEffect.PHOBOS.name);
         break;
-      case 'effect-heat':
+      case ImgEffect.HEAT.id:
         setEffect(ImgEffect.HEAT.name);
         break;
     }
@@ -293,12 +284,7 @@
 
   // Меняем масштаб фоточки
   var setScale = function (value) {
-    imgPreview.style.transform = 'scale(0.' + value + ')';
-
-    if (value >= Scale.Max) {
-      imgPreview.style = '';
-    }
-
+    imgPreview.style.transform = 'scale(' + value / 100 + ')';
     scaleControlValue.value = value + '%';
   };
 
@@ -329,29 +315,32 @@
 
   var validateHashtags = function () {
     var userHashtags = document.querySelector('.text__hashtags').value;
-    var splitHashtags = userHashtags.split(' ');
 
-    if (splitHashtags.length > Hashtag.MAX_NUMBER) {
-      showValidationError(HashtagMessage.TOO_MANY);
-    }
+    if (userHashtags) {
+      var splitHashtags = userHashtags.split(' ');
 
-    for (var i = 0; i < splitHashtags.length; i++) {
-      var currentHashtag = splitHashtags[i].toLowerCase();
-      var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
+      if (splitHashtags.length > Hashtag.MAX_NUMBER) {
+        showValidationError(HashtagMessage.TOO_MANY);
+      }
 
-      if (sameHashtags > 1) {
-        showValidationError(HashtagMessage.SAME);
-      }
-      if (currentHashtag[0] !== '#') {
-        showValidationError(HashtagMessage.NOT_HASH);
-      }
-      if (currentHashtag.length < Hashtag.MIN_LENGTH) {
-        showValidationError(HashtagMessage.SHORT);
-      }
-      if (currentHashtag.length > Hashtag.MAX_LENGTH) {
-        showValidationError(HashtagMessage.LONG);
-      } else {
-        textHashtags.style = '';
+      for (var i = 0; i < splitHashtags.length; i++) {
+        var currentHashtag = splitHashtags[i].toLowerCase();
+        var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
+
+        if (sameHashtags > 1) {
+          showValidationError(HashtagMessage.SAME);
+        }
+        if (currentHashtag[0] !== '#') {
+          showValidationError(HashtagMessage.NOT_HASH);
+        }
+        if (currentHashtag.length < Hashtag.MIN_LENGTH) {
+          showValidationError(HashtagMessage.SHORT);
+        }
+        if (currentHashtag.length > Hashtag.MAX_LENGTH) {
+          showValidationError(HashtagMessage.LONG);
+        } else {
+          textHashtags.style = '';
+        }
       }
     }
   };
@@ -385,21 +374,21 @@
       var effect = effectsList.querySelector('input[type=radio]:checked');
 
       switch (effect.id) {
-        case 'effect-chrome':
+        case ImgEffect.CHROME.id:
           imgPreview.style.filter = setFilterValue(ImgEffect.CHROME.filter, filterValue);
           break;
-        case 'effect-sepia':
+        case ImgEffect.SEPIA.id:
           imgPreview.style.filter = setFilterValue(ImgEffect.SEPIA.filter, filterValue);
           break;
-        case 'effect-marvin':
+        case ImgEffect.MARVIN.id:
           filterValue = level;
           imgPreview.style.filter = setFilterValue(ImgEffect.MARVIN.filter, filterValue, ImgEffect.MARVIN.unit);
           break;
-        case 'effect-phobos':
+        case ImgEffect.PHOBOS.id:
           filterValue = level * ImgEffect.PHOBOS.max / EffectValue.MAX;
           imgPreview.style.filter = setFilterValue(ImgEffect.PHOBOS.filter, filterValue, ImgEffect.PHOBOS.unit);
           break;
-        case 'effect-heat':
+        case ImgEffect.HEAT.id:
           filterValue = level * ImgEffect.HEAT.max / EffectValue.MAX;
           imgPreview.style.filter = setFilterValue(ImgEffect.HEAT.filter, filterValue);
           break;
@@ -437,4 +426,12 @@
 
   // Накидываем обработчики
   fileUpload.addEventListener('change', onFileUploadChange);
+
+  window.form = {
+    fileUpload: fileUpload,
+    imgPreview: imgPreview,
+    error: error,
+    main: main
+  };
+
 })();

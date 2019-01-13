@@ -13,17 +13,12 @@
   var socialCommentLoad = bigPicture.querySelector('.comments-loader');
   var commentsList = bigPicture.querySelector('.social__comments');
   var bigPictureClose = bigPicture.querySelector('#picture-cancel');
+  var currentPicture;
 
 
   // Удаляем дефолтные комментарии из разметки
-  var removeComment = function () {
-    var comments = commentsList.querySelectorAll('.social__comment');
-    var comment;
-
-    comments.forEach(function (elem, index, array) {
-      comment = array[index];
-      commentsList.removeChild(comment);
-    });
+  var removeComments = function () {
+    commentsList.innerHTML = '';
   };
 
 
@@ -60,32 +55,48 @@
   // Добавляем комментарий в разметку
   var addComments = function (picture) {
     var fragment = document.createDocumentFragment();
-    var comments = picture.comments;
+    var comments = picture.comments.length > COMMENTS_COUNT ?
+      picture.comments.slice(0, COMMENTS_COUNT) :
+      picture.comments.slice();
 
-    if (comments.length > COMMENTS_COUNT) {
-      for (var i = 0; i < COMMENTS_COUNT; i++) {
-        var comment = comments[i];
-        fragment.appendChild(createComment(comment));
-      }
-    } else {
-      comments.forEach(function (elem, index, array) {
-        comment = array[index];
-        fragment.appendChild(createComment(comment));
-      });
+    comments.forEach(function (comment) {
+      fragment.appendChild(createComment(comment));
+    });
+
+    commentsList.appendChild(fragment);
+  };
+
+  var addMoreComments = function (picture) {
+    var fragment = document.createDocumentFragment();
+    var addedComments = document.querySelectorAll('.social__comment');
+    var commentsCountToRender = picture.comments.length - addedComments.length;
+    var comments = commentsCountToRender >= COMMENTS_COUNT ?
+      picture.comments.slice(addedComments.length, addedComments.length + COMMENTS_COUNT) :
+      picture.comments.slice(addedComments.length);
+    var addedCommentsCount = addedComments.length + comments.length;
+
+    comments.forEach(function (comment) {
+      fragment.appendChild(createComment(comment));
+    });
+
+    if (addedCommentsCount === picture.comments.length) {
+      socialCommentLoad.classList.add('visually-hidden');
     }
 
+    socialCommentCount.innerHTML = addedCommentsCount + ' из <span class="comments-count">' + picture.comments.length + '</span> комментариев';
     commentsList.appendChild(fragment);
   };
 
 
   // Заполняем и показываем большую фоточку
   var fillOverlay = function (picture) {
+    currentPicture = picture;
     bigPictureImg.src = picture.url;
     likesCount.textContent = picture.likes;
     commentsCount.textContent = picture.comments.length;
     socialCaption.textContent = picture.description;
 
-    removeComment(); // Удаляем дефолтные комментарии из разметки
+    removeComments(); // Удаляем дефолтные комментарии из разметки
     addComments(picture);
 
     bigPicture.classList.remove('hidden');
@@ -96,6 +107,7 @@
     } else {
       socialCommentCount.innerHTML = COMMENTS_COUNT + ' из <span class="comments-count">' + picture.comments.length + '</span> комментариев';
       socialCommentLoad.classList.remove('visually-hidden');
+      socialCommentLoad.addEventListener('click', onSocialCommentLoadClick);
     }
 
     document.addEventListener('keydown', onBigPictureEscKeydown);
@@ -110,6 +122,7 @@
     document.removeEventListener('keydown', onBigPictureEscKeydown);
     bigPictureClose.removeEventListener('click', onBigPictureCloseClick);
     bigPictureClose.removeEventListener('keydown', onBigPictureCloseEnterKeydown);
+    socialCommentLoad.removeEventListener('click', onSocialCommentLoadClick);
   };
 
   var onBigPictureCloseClick = function () {
@@ -122,6 +135,10 @@
 
   var onBigPictureEscKeydown = function (evt) {
     window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeBigPicture);
+  };
+
+  var onSocialCommentLoadClick = function () {
+    addMoreComments(currentPicture);
   };
 
   window.preview = {

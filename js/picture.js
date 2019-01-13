@@ -10,16 +10,15 @@
   var filterPopular = imgFilters.querySelector('#filter-popular');
   var filterNew = imgFilters.querySelector('#filter-new');
   var filterDiscussed = imgFilters.querySelector('#filter-discussed');
+  var picturesData = [];
 
 
   // Удаляем фотографии из разметки
   var removePictures = function () {
     var photos = picturesList.querySelectorAll('.picture');
-    var photo;
 
-    photos.forEach(function (elem, index, array) {
-      photo = array[index];
-      picturesList.removeChild(photo);
+    photos.forEach(function (elem) {
+      picturesList.removeChild(elem);
     });
   };
 
@@ -54,20 +53,20 @@
 
 
   // Отрисовываем фотографии
-  var renderPictures = function (array, length) {
+  var renderPictures = function (array) {
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < length; i++) {
-      var currentPicture = getPicture(array[i]);
+    array.forEach(function (picture, index) {
+      var currentPicture = getPicture(picture);
 
-      currentPicture.dataset.id = i;
+      currentPicture.dataset.id = index;
       fragment.appendChild(currentPicture);
 
       currentPicture.addEventListener('click', function (evt) {
         evt.preventDefault();
         window.preview.fillOverlay(array[evt.currentTarget.dataset.id]);
       });
-    }
+    });
 
     picturesList.appendChild(fragment);
   };
@@ -86,7 +85,7 @@
   // Показываем популярные фотографии
   var onFilterPopularClick = window.debounce(function (evt) {
     activateButton(evt);
-    window.backend.downLoad(onSuccsessDownload, onErrorDownload);
+    onSuccsessDownload(picturesData);
   });
 
 
@@ -95,12 +94,12 @@
     var newArray = sortPictures(array);
 
     removePictures();
-    renderPictures(newArray, newArray.length);
+    renderPictures(newArray);
   };
 
   var onFilterDiscussedClick = window.debounce(function (evt) {
     activateButton(evt);
-    window.backend.downLoad(showDiscussedPictures, onErrorDownload);
+    showDiscussedPictures(picturesData);
   });
 
 
@@ -109,19 +108,21 @@
     var newArray = window.util.shuffleArray(array);
 
     removePictures();
-    renderPictures(newArray, NEW_PICTURES_COUNT);
+    renderPictures(newArray.slice(0, NEW_PICTURES_COUNT));
   };
 
   var onFilterNewClick = window.debounce(function (evt) {
     activateButton(evt);
-    window.backend.downLoad(showNewPictures, onErrorDownload);
+    showNewPictures(picturesData);
   });
 
 
   // Успешное выполнение запроса
   var onSuccsessDownload = function (array) {
+    picturesData = array.slice(); // сделать копию слайсом
+
     removePictures();
-    renderPictures(array, array.length);
+    renderPictures(array);
 
     imgFilters.classList.remove('img-filters--inactive');
   };
@@ -129,15 +130,11 @@
 
   // Неуспешное выполнение запроса
   var onErrorDownload = function (errorMessage) {
-    var node = document.createElement('div');
-    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
-    node.style.position = 'absolute';
-    node.style.left = 0;
-    node.style.right = 0;
-    node.style.fontSize = '30px';
+    var message = window.form.error.cloneNode(true);
 
-    node.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', node);
+    window.form.main.appendChild(message);
+    document.querySelector('.error__inner').removeChild(document.querySelector('.error__buttons'));
+    document.querySelector('.error__title').textContent = errorMessage;
   };
 
 
