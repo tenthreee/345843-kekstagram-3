@@ -5,7 +5,7 @@
   var COMMENTS_COUNT = 5;
 
   var bigPicture = document.querySelector('.big-picture');
-  var bigPictureImg = bigPicture.querySelector('img');
+  var bigPictureImage = bigPicture.querySelector('img');
   var socialCaption = bigPicture.querySelector('.social__caption');
   var likesCount = bigPicture.querySelector('.likes-count');
   var commentsCount = bigPicture.querySelector('.comments-count');
@@ -91,7 +91,7 @@
   // Заполняем и показываем большую фоточку
   var fillOverlay = function (picture) {
     currentPicture = picture;
-    bigPictureImg.src = picture.url;
+    bigPictureImage.src = picture.url;
     likesCount.textContent = picture.likes;
     commentsCount.textContent = picture.comments.length;
     socialCaption.textContent = picture.description;

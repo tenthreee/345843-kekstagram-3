@@ -6,10 +6,10 @@
   var picturesList = document.querySelector('.pictures');
   var template = document.querySelector('#picture');
   var pictureTemplate = template.content.querySelector('.picture');
-  var imgFilters = document.querySelector('.img-filters');
-  var filterPopular = imgFilters.querySelector('#filter-popular');
-  var filterNew = imgFilters.querySelector('#filter-new');
-  var filterDiscussed = imgFilters.querySelector('#filter-discussed');
+  var imageFilters = document.querySelector('.img-filters');
+  var filterPopular = imageFilters.querySelector('#filter-popular');
+  var filterNew = imageFilters.querySelector('#filter-new');
+  var filterDiscussed = imageFilters.querySelector('#filter-discussed');
   var picturesData = [];
 
 
@@ -124,7 +124,7 @@
     removePictures();
     renderPictures(array);
 
-    imgFilters.classList.remove('img-filters--inactive');
+    imageFilters.classList.remove('img-filters--inactive');
   };
 
 

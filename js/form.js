@@ -18,7 +18,7 @@
     MAX: 100
   };
 
-  var ImgEffect = {
+  var Effect = {
     NONE: {
       id: 'effect-none'
     },
@@ -77,25 +77,30 @@
     LONG: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку'
   };
 
+  var HashtagSymbol = {
+    START: '#',
+    SPLIT: ' '
+  };
+
   var picturesList = document.querySelector('.pictures');
   var form = picturesList.querySelector('.img-upload__form');
   var fileUpload = picturesList.querySelector('#upload-file');
-  var imgUpload = picturesList.querySelector('.img-upload__overlay');
-  var uploadCancel = imgUpload.querySelector('#upload-cancel');
-  var effectLevel = imgUpload.querySelector('.effect-level');
+  var imageUpload = picturesList.querySelector('.img-upload__overlay');
+  var uploadCancel = imageUpload.querySelector('#upload-cancel');
+  var effectLevel = imageUpload.querySelector('.effect-level');
   var effectLeveline = effectLevel.querySelector('.effect-level__line');
   var effectLevelPin = effectLevel.querySelector('.effect-level__pin');
   var effectLevelDepth = effectLevel.querySelector('.effect-level__depth');
   var effectLevelValue = effectLevel.querySelector('.effect-level__value');
-  var imgUploadPreview = imgUpload.querySelector('.img-upload__preview');
-  var imgPreview = imgUploadPreview.querySelector('img');
-  var effectsList = imgUpload.querySelector('.effects__list');
-  var scaleControlSmaller = imgUpload.querySelector('.scale__control--smaller');
-  var scaleControlBigger = imgUpload.querySelector('.scale__control--bigger');
-  var scaleControlValue = imgUpload.querySelector('.scale__control--value');
-  var textDescription = imgUpload.querySelector('.text__description');
-  var textHashtags = imgUpload.querySelector('.text__hashtags');
-  var uploadSubmit = imgUpload.querySelector('#upload-submit');
+  var imageUploadPreview = imageUpload.querySelector('.img-upload__preview');
+  var imagePreview = imageUploadPreview.querySelector('img');
+  var effectsList = imageUpload.querySelector('.effects__list');
+  var scaleControlSmaller = imageUpload.querySelector('.scale__control--smaller');
+  var scaleControlBigger = imageUpload.querySelector('.scale__control--bigger');
+  var scaleControlValue = imageUpload.querySelector('.scale__control--value');
+  var textDescription = imageUpload.querySelector('.text__description');
+  var textHashtags = imageUpload.querySelector('.text__hashtags');
+  var uploadSubmit = imageUpload.querySelector('#upload-submit');
   var main = document.querySelector('main');
   var successTemplate = document.querySelector('#success');
   var success = successTemplate.content.querySelector('.success');
@@ -103,17 +108,18 @@
   var errorTemplate = document.querySelector('#error');
   var error = errorTemplate.content.querySelector('.error');
   var errorButton = errorTemplate.content.querySelector('.error__button');
+  var activeEffect;
 
 
   // Закрываем форму редактирования изображения
-  var closeImgUpload = function () {
+  var closeimageUpload = function () {
     var focused = document.activeElement;
 
     if (focused !== textDescription && focused !== textHashtags) {
-      imgUpload.classList.add('hidden');
+      imageUpload.classList.add('hidden');
       form.reset();
 
-      document.removeEventListener('keydown', onImgUploadEscKeydown);
+      document.removeEventListener('keydown', onimageUploadEscKeydown);
       uploadCancel.removeEventListener('click', onUploadCancelClick);
       uploadCancel.removeEventListener('keydown', onUploadCancelEnterKeydown);
       effectsList.removeEventListener('click', onEffecstListClick);
@@ -126,21 +132,21 @@
   };
 
   var onUploadCancelClick = function () {
-    closeImgUpload();
+    closeimageUpload();
   };
 
   var onUploadCancelEnterKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeImgUpload);
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeimageUpload);
   };
 
-  var onImgUploadEscKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeImgUpload);
+  var onimageUploadEscKeydown = function (evt) {
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeimageUpload);
   };
 
 
   // Показываем модалки
   var showSuccessModal = function () {
-    closeImgUpload();
+    closeimageUpload();
     var message = success.cloneNode(true);
 
     main.appendChild(message);
@@ -151,7 +157,7 @@
   };
 
   var showErrorModal = function () {
-    closeImgUpload();
+    closeimageUpload();
     var message = error.cloneNode(true);
 
     main.appendChild(message);
@@ -202,23 +208,25 @@
 
   // Сбрасываем эффект
   var resetEffect = function () {
-    imgPreview.style = '';
-    imgPreview.className = '';
+    imagePreview.style = '';
+    imagePreview.className = '';
     effectLevelDepth.style.width = '100%';
     effectLevelPin.style.left = '100%';
     effectLevelValue.value = '100';
     scaleControlValue.value = '100%';
+    effectLevel.classList.add('hidden');
   };
 
 
   // Открываем форму редактирования изображения
   var onFileUploadChange = function () {
     window.photo.getUserPhoto();
-    imgUpload.classList.remove('hidden');
-    effectLevel.classList.add('hidden');
+    imageUpload.classList.remove('hidden');
+    activeEffect = document.querySelector('#effect-none');
+    activeEffect.checked = true;
     resetEffect();
 
-    document.addEventListener('keydown', onImgUploadEscKeydown);
+    document.addEventListener('keydown', onimageUploadEscKeydown);
     uploadCancel.addEventListener('click', onUploadCancelClick);
     uploadCancel.addEventListener('keydown', onUploadCancelEnterKeydown);
     effectsList.addEventListener('click', onEffecstListClick);
@@ -234,57 +242,52 @@
   };
 
 
-  // Применяем эффекты к фоточке
-  var setEffect = function (effect) {
-    resetEffect();
-    effectLevel.classList.remove('hidden');
-    imgPreview.classList.add('effects__preview--' + effect);
+  // Применяем эффект к фоточке
+  var getEffect = function () {
+    activeEffect = effectsList.querySelector('input[type=radio]:checked');
+
+    switch (activeEffect.id) {
+      case Effect.CHROME.id:
+        return Effect.CHROME;
+      case Effect.SEPIA.id:
+        return Effect.SEPIA;
+      case Effect.MARVIN.id:
+        return Effect.MARVIN;
+      case Effect.PHOBOS.id:
+        return Effect.PHOBOS;
+      case Effect.HEAT.id:
+        return Effect.HEAT;
+      default:
+        return '';
+    }
   };
 
-  var switchEffects = function () {
-    var effect = effectsList.querySelector('input[type=radio]:checked');
+  var setEffect = function () {
+    resetEffect();
 
-    switch (effect.id) {
-      case ImgEffect.NONE.id:
-        imgPreview.className = '';
-        effectLevel.classList.add('hidden');
-        break;
-      case ImgEffect.CHROME.id:
-        setEffect(ImgEffect.CHROME.name);
-        break;
-      case ImgEffect.SEPIA.id:
-        setEffect(ImgEffect.SEPIA.name);
-        break;
-      case ImgEffect.MARVIN.id:
-        setEffect(ImgEffect.MARVIN.name);
-        break;
-      case ImgEffect.PHOBOS.id:
-        setEffect(ImgEffect.PHOBOS.name);
-        break;
-      case ImgEffect.HEAT.id:
-        setEffect(ImgEffect.HEAT.name);
-        break;
+    var effect = getEffect();
+
+    if (effect !== '') {
+      effectLevel.classList.remove('hidden');
+      imagePreview.classList.add('effects__preview--' + effect.name);
+      setFilterValue(effect, effect.max);
     }
   };
 
   var onEffecstListClick = function () {
-    switchEffects();
+    setEffect();
   };
 
 
-  // Прописываем уровень фильтра
-  var setFilterValue = function (filter, value, units) {
-    if (units) {
-      return filter + '(' + value + units + ')';
-    }
-
-    return filter + '(' + value + ')';
+  // Задаём уровень фильтра
+  var setFilterValue = function (effect, value) {
+    imagePreview.style.filter = effect.filter + '(' + value + effect.unit + ')';
   };
 
 
   // Меняем масштаб фоточки
   var setScale = function (value) {
-    imgPreview.style.transform = 'scale(' + value / 100 + ')';
+    imagePreview.style.transform = 'scale(' + value / 100 + ')';
     scaleControlValue.value = value + '%';
   };
 
@@ -317,20 +320,20 @@
     var userHashtags = document.querySelector('.text__hashtags').value;
 
     if (userHashtags) {
-      var splitHashtags = userHashtags.split(' ');
+      var splitHashtags = userHashtags.split(HashtagSymbol.SPLIT);
 
       if (splitHashtags.length > Hashtag.MAX_NUMBER) {
         showValidationError(HashtagMessage.TOO_MANY);
       }
 
-      for (var i = 0; i < splitHashtags.length; i++) {
-        var currentHashtag = splitHashtags[i].toLowerCase();
+      splitHashtags.forEach(function (elem) {
+        var currentHashtag = elem.toLowerCase();
         var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
 
         if (sameHashtags > 1) {
           showValidationError(HashtagMessage.SAME);
         }
-        if (currentHashtag[0] !== '#') {
+        if (currentHashtag[0] !== HashtagSymbol.START) {
           showValidationError(HashtagMessage.NOT_HASH);
         }
         if (currentHashtag.length < Hashtag.MIN_LENGTH) {
@@ -341,7 +344,7 @@
         } else {
           textHashtags.style = '';
         }
-      }
+      });
     }
   };
 
@@ -368,31 +371,11 @@
       effectLevelDepth.style.width = effectLevelPinLeft + '%';
 
       // Меняем глубину эффекта при перемещнии пина
-      var level = effectLevelPinLeft;
-      effectLevelValue.value = level;
-      var filterValue = level / EffectValue.MAX;
-      var effect = effectsList.querySelector('input[type=radio]:checked');
+      activeEffect = getEffect();
+      var filterValue = activeEffect.min + (effectLevelPinLeft / EffectValue.MAX) * (activeEffect.max - activeEffect.min);
 
-      switch (effect.id) {
-        case ImgEffect.CHROME.id:
-          imgPreview.style.filter = setFilterValue(ImgEffect.CHROME.filter, filterValue);
-          break;
-        case ImgEffect.SEPIA.id:
-          imgPreview.style.filter = setFilterValue(ImgEffect.SEPIA.filter, filterValue);
-          break;
-        case ImgEffect.MARVIN.id:
-          filterValue = level;
-          imgPreview.style.filter = setFilterValue(ImgEffect.MARVIN.filter, filterValue, ImgEffect.MARVIN.unit);
-          break;
-        case ImgEffect.PHOBOS.id:
-          filterValue = level * ImgEffect.PHOBOS.max / EffectValue.MAX;
-          imgPreview.style.filter = setFilterValue(ImgEffect.PHOBOS.filter, filterValue, ImgEffect.PHOBOS.unit);
-          break;
-        case ImgEffect.HEAT.id:
-          filterValue = level * ImgEffect.HEAT.max / EffectValue.MAX;
-          imgPreview.style.filter = setFilterValue(ImgEffect.HEAT.filter, filterValue);
-          break;
-      }
+      effectLevelValue.value = effectLevelPinLeft;
+      setFilterValue(activeEffect, filterValue);
     };
 
     var onPinMouseUp = function (upEvt) {
@@ -429,7 +412,7 @@
 
   window.form = {
     fileUpload: fileUpload,
-    imgPreview: imgPreview,
+    imagePreview: imagePreview,
     error: error,
     main: main
   };

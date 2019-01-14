@@ -15,7 +15,7 @@
       var reader = new FileReader();
 
       reader.addEventListener('load', function () {
-        window.form.imgPreview.src = reader.result;
+        window.form.imagePreview.src = reader.result;
       });
 
       reader.readAsDataURL(file);
