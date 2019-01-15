@@ -6,11 +6,11 @@
   var picturesList = document.querySelector('.pictures');
   var template = document.querySelector('#picture');
   var pictureTemplate = template.content.querySelector('.picture');
-  var imageFilters = document.querySelector('.img-filters');
-  var filterPopular = imageFilters.querySelector('#filter-popular');
-  var filterNew = imageFilters.querySelector('#filter-new');
-  var filterDiscussed = imageFilters.querySelector('#filter-discussed');
-  var picturesData = [];
+  var imageFilter = document.querySelector('.img-filters');
+  var filterPopular = imageFilter.querySelector('#filter-popular');
+  var filterNew = imageFilter.querySelector('#filter-new');
+  var filterDiscussed = imageFilter.querySelector('#filter-discussed');
+  var pictures = [];
 
 
   // Удаляем фотографии из разметки
@@ -85,7 +85,7 @@
   // Показываем популярные фотографии
   var onFilterPopularClick = window.debounce(function (evt) {
     activateButton(evt);
-    onSuccsessDownload(picturesData);
+    onSuccsessDownload(pictures);
   });
 
 
@@ -99,7 +99,7 @@
 
   var onFilterDiscussedClick = window.debounce(function (evt) {
     activateButton(evt);
-    showDiscussedPictures(picturesData);
+    showDiscussedPictures(pictures);
   });
 
 
@@ -113,18 +113,18 @@
 
   var onFilterNewClick = window.debounce(function (evt) {
     activateButton(evt);
-    showNewPictures(picturesData);
+    showNewPictures(pictures);
   });
 
 
   // Успешное выполнение запроса
   var onSuccsessDownload = function (array) {
-    picturesData = array.slice(); // сделать копию слайсом
+    pictures = array.slice(); // сделать копию слайсом
 
     removePictures();
     renderPictures(array);
 
-    imageFilters.classList.remove('img-filters--inactive');
+    imageFilter.classList.remove('img-filters--inactive');
   };
 
 

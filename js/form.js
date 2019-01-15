@@ -15,7 +15,8 @@
 
   var EffectValue = {
     MIN: 0,
-    MAX: 100
+    MAX: 100,
+    STEP: 10
   };
 
   var Effect = {
@@ -95,11 +96,11 @@
   var imageUploadPreview = imageUpload.querySelector('.img-upload__preview');
   var imagePreview = imageUploadPreview.querySelector('img');
   var effectsList = imageUpload.querySelector('.effects__list');
-  var scaleControlSmaller = imageUpload.querySelector('.scale__control--smaller');
-  var scaleControlBigger = imageUpload.querySelector('.scale__control--bigger');
+  var smallScaleControl = imageUpload.querySelector('.scale__control--smaller');
+  var bigScaleControl = imageUpload.querySelector('.scale__control--bigger');
   var scaleControlValue = imageUpload.querySelector('.scale__control--value');
   var textDescription = imageUpload.querySelector('.text__description');
-  var textHashtags = imageUpload.querySelector('.text__hashtags');
+  var textHashtag = imageUpload.querySelector('.text__hashtags');
   var uploadSubmit = imageUpload.querySelector('#upload-submit');
   var main = document.querySelector('main');
   var successTemplate = document.querySelector('#success');
@@ -112,41 +113,44 @@
 
 
   // Закрываем форму редактирования изображения
-  var closeimageUpload = function () {
+  var closeImageUpload = function () {
     var focused = document.activeElement;
 
-    if (focused !== textDescription && focused !== textHashtags) {
+    if (focused !== textDescription && focused !== textHashtag) {
       imageUpload.classList.add('hidden');
       form.reset();
 
-      document.removeEventListener('keydown', onimageUploadEscKeydown);
+      document.removeEventListener('keydown', onImageUploadEscKeydown);
       uploadCancel.removeEventListener('click', onUploadCancelClick);
       uploadCancel.removeEventListener('keydown', onUploadCancelEnterKeydown);
       effectsList.removeEventListener('click', onEffecstListClick);
-      scaleControlSmaller.removeEventListener('click', onScaleControlSmallerClick);
-      scaleControlBigger.removeEventListener('click', onScaleControlBiggerClick);
+      smallScaleControl.removeEventListener('click', onsmallScaleControlClick);
+      bigScaleControl.removeEventListener('click', onbigScaleControlClick);
       uploadSubmit.removeEventListener('click', validateHashtags);
       form.removeEventListener('submit', onUploadSubmitClick);
-      textHashtags.removeEventListener('input', onTextHashtagsInput);
+      textHashtag.removeEventListener('input', ontextHashtagInput);
+      effectLevel.removeEventListener('click', onEffectLevelClick);
+      effectLevelPin.removeEventListener('keydown', onEffectLevelPinLeftKeydown);
+      effectLevelPin.removeEventListener('keydown', onEffectLevelPinRightKeydown);
     }
   };
 
   var onUploadCancelClick = function () {
-    closeimageUpload();
+    closeImageUpload();
   };
 
   var onUploadCancelEnterKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeimageUpload);
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeImageUpload);
   };
 
-  var onimageUploadEscKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeimageUpload);
+  var onImageUploadEscKeydown = function (evt) {
+    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeImageUpload);
   };
 
 
   // Показываем модалки
   var showSuccessModal = function () {
-    closeimageUpload();
+    closeImageUpload();
     var message = success.cloneNode(true);
 
     main.appendChild(message);
@@ -157,7 +161,7 @@
   };
 
   var showErrorModal = function () {
-    closeimageUpload();
+    closeImageUpload();
     var message = error.cloneNode(true);
 
     main.appendChild(message);
@@ -222,23 +226,23 @@
   var onFileUploadChange = function () {
     window.photo.getUserPhoto();
     imageUpload.classList.remove('hidden');
-    activeEffect = document.querySelector('#effect-none');
+    activeEffect = effectsList.querySelector('#effect-none');
     activeEffect.checked = true;
     resetEffect();
 
-    document.addEventListener('keydown', onimageUploadEscKeydown);
+    document.addEventListener('keydown', onImageUploadEscKeydown);
     uploadCancel.addEventListener('click', onUploadCancelClick);
     uploadCancel.addEventListener('keydown', onUploadCancelEnterKeydown);
     effectsList.addEventListener('click', onEffecstListClick);
-    scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
-    scaleControlBigger.addEventListener('click', onScaleControlBiggerClick);
+    smallScaleControl.addEventListener('click', onsmallScaleControlClick);
+    bigScaleControl.addEventListener('click', onbigScaleControlClick);
     uploadSubmit.addEventListener('click', validateHashtags);
     form.addEventListener('submit', onUploadSubmitClick);
-    textHashtags.addEventListener('input', onTextHashtagsInput);
+    textHashtag.addEventListener('input', ontextHashtagInput);
   };
 
-  var onTextHashtagsInput = function () {
-    textHashtags.setCustomValidity('');
+  var ontextHashtagInput = function () {
+    textHashtag.setCustomValidity('');
   };
 
 
@@ -291,7 +295,7 @@
     scaleControlValue.value = value + '%';
   };
 
-  var onScaleControlSmallerClick = function () {
+  var onsmallScaleControlClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
     if (value > Scale.MIN) {
@@ -300,7 +304,7 @@
     }
   };
 
-  var onScaleControlBiggerClick = function () {
+  var onbigScaleControlClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
     if (value < Scale.MAX) {
@@ -312,8 +316,8 @@
 
   // Валидируем хэштеги
   var showValidationError = function (message) {
-    textHashtags.setCustomValidity(message);
-    textHashtags.style = 'border:1px solid red';
+    textHashtag.setCustomValidity(message);
+    textHashtag.style = 'border:1px solid red';
   };
 
   var validateHashtags = function () {
@@ -342,7 +346,7 @@
         if (currentHashtag.length > Hashtag.MAX_LENGTH) {
           showValidationError(HashtagMessage.LONG);
         } else {
-          textHashtags.style = '';
+          textHashtag.style = '';
         }
       });
     }
@@ -353,29 +357,10 @@
   effectLevelPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
-    var startX = evt.clientX;
-
     var onPinMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
-      var shift = startX - moveEvt.clientX;
-
-      var effectLevelLineLeft = effectLeveline.getBoundingClientRect().left;
-      var effectLevelPinLeft = Math.round((startX - shift - effectLevelLineLeft) / effectLeveline.offsetWidth * 100);
-
-      if (effectLevelPinLeft > EffectValue.MAX || effectLevelPinLeft < EffectValue.MIN) {
-        return;
-      }
-
-      effectLevelPin.style.left = effectLevelPinLeft + '%';
-      effectLevelDepth.style.width = effectLevelPinLeft + '%';
-
-      // Меняем глубину эффекта при перемещнии пина
-      activeEffect = getEffect();
-      var filterValue = activeEffect.min + (effectLevelPinLeft / EffectValue.MAX) * (activeEffect.max - activeEffect.min);
-
-      effectLevelValue.value = effectLevelPinLeft;
-      setFilterValue(activeEffect, filterValue);
+      getFilterValue(moveEvt.clientX);
     };
 
     var onPinMouseUp = function (upEvt) {
@@ -388,6 +373,29 @@
     document.addEventListener('mousemove', onPinMouseMove);
     document.addEventListener('mouseup', onPinMouseUp);
   });
+
+
+  // Получаем уровень фильтра
+  var getFilterValue = function (coordinate) {
+    var effectLevelPinLeft = Math.round((coordinate - effectLeveline.getBoundingClientRect().left) / effectLeveline.offsetWidth * 100);
+
+    if (effectLevelPinLeft > EffectValue.MAX || effectLevelPinLeft < EffectValue.MIN) {
+      return;
+    }
+
+    setStyle(effectLevelPinLeft);
+  };
+
+  var setStyle = function (value) {
+    effectLevelPin.style.left = value + '%';
+    effectLevelDepth.style.width = value + '%';
+
+    activeEffect = getEffect();
+    var filterValue = activeEffect.min + (value / EffectValue.MAX) * (activeEffect.max - activeEffect.min);
+
+    effectLevelValue.value = value;
+    setFilterValue(activeEffect, filterValue);
+  };
 
 
   // Отправляем данные из формы
@@ -407,8 +415,37 @@
   };
 
 
+  // Задаём уровень эффекта кликом
+  var onEffectLevelClick = function (evt) {
+    getFilterValue(evt.clientX);
+  };
+
+
+  // Меняем уровень эффека с клавиатуры
+  var onEffectLevelPinLeftKeydown = function (evt) {
+    var effectLevelPinPosition = parseInt(effectLevelPin.style.left, 10);
+
+    if (evt.keyCode === window.util.Keycode.ARROW_LEFT && effectLevelPinPosition > EffectValue.MIN) {
+      effectLevelPinPosition -= EffectValue.STEP;
+      setStyle(effectLevelPinPosition);
+    }
+  };
+
+  var onEffectLevelPinRightKeydown = function (evt) {
+    var effectLevelPinPosition = parseInt(effectLevelPin.style.left, 10);
+
+    if (evt.keyCode === window.util.Keycode.ARROW_RIGHT && effectLevelPinPosition < EffectValue.MAX) {
+      effectLevelPinPosition += EffectValue.STEP;
+      setStyle(effectLevelPinPosition);
+    }
+  };
+
+
   // Накидываем обработчики
   fileUpload.addEventListener('change', onFileUploadChange);
+  effectLevel.addEventListener('click', onEffectLevelClick);
+  effectLevelPin.addEventListener('keydown', onEffectLevelPinLeftKeydown);
+  effectLevelPin.addEventListener('keydown', onEffectLevelPinRightKeydown);
 
   window.form = {
     fileUpload: fileUpload,

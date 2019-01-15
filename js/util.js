@@ -3,7 +3,9 @@
 (function () {
   var Keycode = {
     ESC: 27,
-    ENTER: 13
+    ENTER: 13,
+    ARROW_LEFT: 37,
+    ARROW_RIGHT: 39
   };
 
   // Получаем случайное число
