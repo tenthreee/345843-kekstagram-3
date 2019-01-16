@@ -124,7 +124,7 @@
       uploadCancel.removeEventListener('click', onUploadCancelClick);
       uploadCancel.removeEventListener('keydown', onUploadCancelEnterKeydown);
       effectsList.removeEventListener('click', onEffecstListClick);
-      smallScaleControl.removeEventListener('click', onsmallScaleControlClick);
+      smallScaleControl.removeEventListener('click', onSmallScaleControlClick);
       bigScaleControl.removeEventListener('click', onbigScaleControlClick);
       uploadSubmit.removeEventListener('click', validateHashtags);
       form.removeEventListener('submit', onUploadSubmitClick);
@@ -234,7 +234,7 @@
     uploadCancel.addEventListener('click', onUploadCancelClick);
     uploadCancel.addEventListener('keydown', onUploadCancelEnterKeydown);
     effectsList.addEventListener('click', onEffecstListClick);
-    smallScaleControl.addEventListener('click', onsmallScaleControlClick);
+    smallScaleControl.addEventListener('click', onSmallScaleControlClick);
     bigScaleControl.addEventListener('click', onbigScaleControlClick);
     uploadSubmit.addEventListener('click', validateHashtags);
     form.addEventListener('submit', onUploadSubmitClick);
@@ -295,7 +295,7 @@
     scaleControlValue.value = value + '%';
   };
 
-  var onsmallScaleControlClick = function () {
+  var onSmallScaleControlClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
     if (value > Scale.MIN) {
