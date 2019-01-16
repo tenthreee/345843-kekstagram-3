@@ -429,6 +429,10 @@
       effectLevelPinPosition -= EffectValue.STEP;
       setStyle(effectLevelPinPosition);
     }
+
+    if (effectLevelPinPosition <= EffectValue.MIN) {
+      setStyle(EffectValue.MIN);
+    }
   };
 
   var onEffectLevelPinRightKeydown = function (evt) {
@@ -437,6 +441,10 @@
     if (evt.keyCode === window.util.Keycode.ARROW_RIGHT && effectLevelPinPosition < EffectValue.MAX) {
       effectLevelPinPosition += EffectValue.STEP;
       setStyle(effectLevelPinPosition);
+    }
+
+    if (effectLevelPinPosition >= EffectValue.MAX) {
+      setStyle(EffectValue.MAX);
     }
   };
 
