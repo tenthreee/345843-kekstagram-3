@@ -85,7 +85,9 @@
   // Показываем популярные фотографии
   var onFilterPopularClick = window.debounce(function (evt) {
     activateButton(evt);
-    onSuccsessDownload(pictures);
+
+    removePictures();
+    renderPictures(pictures);
   });
 
 
@@ -105,7 +107,8 @@
 
   // Показываем новые фотографии
   var showNewPictures = function (array) {
-    var newArray = window.util.shuffleArray(array);
+    var newArray = array.slice();
+    window.util.shuffleArray(newArray);
 
     removePictures();
     renderPictures(newArray.slice(0, NEW_PICTURES_COUNT));
@@ -119,7 +122,7 @@
 
   // Успешное выполнение запроса
   var onSuccsessDownload = function (array) {
-    pictures = array.slice(); // сделать копию слайсом
+    pictures = array.slice();
 
     removePictures();
     renderPictures(array);
