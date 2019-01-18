@@ -239,6 +239,9 @@
     uploadSubmit.addEventListener('click', validateHashtags);
     form.addEventListener('submit', onUploadSubmitClick);
     textHashtag.addEventListener('input', ontextHashtagInput);
+    effectLevel.addEventListener('click', onEffectLevelClick);
+    effectLevelPin.addEventListener('keydown', onEffectLevelPinLeftKeydown);
+    effectLevelPin.addEventListener('keydown', onEffectLevelPinRightKeydown);
   };
 
   var ontextHashtagInput = function () {
@@ -451,9 +454,6 @@
 
   // Накидываем обработчики
   fileUpload.addEventListener('change', onFileUploadChange);
-  effectLevel.addEventListener('click', onEffectLevelClick);
-  effectLevelPin.addEventListener('keydown', onEffectLevelPinLeftKeydown);
-  effectLevelPin.addEventListener('keydown', onEffectLevelPinRightKeydown);
 
   window.form = {
     fileUpload: fileUpload,
