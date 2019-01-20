@@ -34,21 +34,21 @@
 
 
   // Ищем дубль в массиве
-  var searchDuplicate = function (elem, arr) {
+  var searchDuplicate = function (element, array) {
     var duplicate = 0;
 
-    for (var i = 0; i < arr.length; i++) {
-      if (arr[i] === elem) {
+    array.forEach(function (elem, index, arr) {
+      if (arr[index] === element) {
         duplicate += 1;
       }
-    }
+    });
 
     return duplicate;
   };
 
 
   // Выполняем что-то по нажатию на какую-то кнопку
-  var checkKeyCodeForAction = function (evt, key, action) {
+  var checkActionCode = function (evt, key, action) {
     if (evt.keyCode === key) {
       action();
     }
@@ -60,7 +60,7 @@
     swapElements: swapElements,
     shuffleArray: shuffleArray,
     searchDuplicate: searchDuplicate,
-    checkKeyCodeForAction: checkKeyCodeForAction,
+    checkActionCode: checkActionCode,
     Keycode: Keycode
   };
 

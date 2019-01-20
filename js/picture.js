@@ -53,10 +53,10 @@
 
 
   // Отрисовываем фотографии
-  var renderPictures = function (array) {
+  var renderPictures = function (photos) {
     var fragment = document.createDocumentFragment();
 
-    array.forEach(function (picture, index) {
+    photos.forEach(function (picture, index) {
       var currentPicture = getPicture(picture);
 
       currentPicture.dataset.id = index;
@@ -64,7 +64,7 @@
 
       currentPicture.addEventListener('click', function (evt) {
         evt.preventDefault();
-        window.preview.fillOverlay(array[evt.currentTarget.dataset.id]);
+        window.preview.fillOverlay(photos[evt.currentTarget.dataset.id]);
       });
     });
 
@@ -106,8 +106,8 @@
 
 
   // Показываем новые фотографии
-  var showNewPictures = function (array) {
-    var newArray = array.slice();
+  var showNewPictures = function (photos) {
+    var newArray = photos.slice();
     window.util.shuffleArray(newArray);
 
     removePictures();
@@ -142,7 +142,7 @@
 
 
   // Получаем данные о фотографиях
-  window.backend.downLoad(onSuccsessDownload, onErrorDownload);
+  window.backend.downloadData(onSuccsessDownload, onErrorDownload);
 
 
   // Обработчки кликов по кнопкам сортировки

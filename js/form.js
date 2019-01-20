@@ -122,13 +122,13 @@
 
       document.removeEventListener('keydown', onImageUploadEscKeydown);
       uploadCancel.removeEventListener('click', onUploadCancelClick);
-      uploadCancel.removeEventListener('keydown', onUploadCancelEnterKeydown);
+      uploadCancel.removeEventListener('keydown', onUploadCancelKeydown);
       effectsList.removeEventListener('click', onEffecstListClick);
       smallScaleControl.removeEventListener('click', onSmallScaleControlClick);
-      bigScaleControl.removeEventListener('click', onbigScaleControlClick);
-      uploadSubmit.removeEventListener('click', validateHashtags);
-      form.removeEventListener('submit', onUploadSubmitClick);
-      textHashtag.removeEventListener('input', ontextHashtagInput);
+      bigScaleControl.removeEventListener('click', onBigScaleControlClick);
+      uploadSubmit.removeEventListener('click', onUploadSubmitClick);
+      form.removeEventListener('submit', onFormSubmit);
+      textHashtag.removeEventListener('input', onTextHashtagInput);
       effectLevel.removeEventListener('click', onEffectLevelClick);
       effectLevelPin.removeEventListener('keydown', onEffectLevelPinLeftKeydown);
       effectLevelPin.removeEventListener('keydown', onEffectLevelPinRightKeydown);
@@ -139,12 +139,12 @@
     closeImageUpload();
   };
 
-  var onUploadCancelEnterKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeImageUpload);
+  var onUploadCancelKeydown = function (evt) {
+    window.util.checkActionCode(evt, window.util.Keycode.ENTER, closeImageUpload);
   };
 
   var onImageUploadEscKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeImageUpload);
+    window.util.checkActionCode(evt, window.util.Keycode.ESC, closeImageUpload);
   };
 
 
@@ -186,19 +186,19 @@
   };
 
   var onSuccessButtonEnterKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeModal('.success'));
+    window.util.checkActionCode(evt, window.util.Keycode.ENTER, closeModal('.success'));
   };
 
   var onErrorButtonEnterKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeModal('.error'));
+    window.util.checkActionCode(evt, window.util.Keycode.ENTER, closeModal('.error'));
   };
 
   var onSuccessEscKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeModal('.success'));
+    window.util.checkActionCode(evt, window.util.Keycode.ESC, closeModal('.success'));
   };
 
   var onErrorEscKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeModal('.error'));
+    window.util.checkActionCode(evt, window.util.Keycode.ESC, closeModal('.error'));
   };
 
   var onSuccessClick = function () {
@@ -232,20 +232,21 @@
 
     document.addEventListener('keydown', onImageUploadEscKeydown);
     uploadCancel.addEventListener('click', onUploadCancelClick);
-    uploadCancel.addEventListener('keydown', onUploadCancelEnterKeydown);
+    uploadCancel.addEventListener('keydown', onUploadCancelKeydown);
     effectsList.addEventListener('click', onEffecstListClick);
     smallScaleControl.addEventListener('click', onSmallScaleControlClick);
-    bigScaleControl.addEventListener('click', onbigScaleControlClick);
-    uploadSubmit.addEventListener('click', validateHashtags);
-    form.addEventListener('submit', onUploadSubmitClick);
-    textHashtag.addEventListener('input', ontextHashtagInput);
+    bigScaleControl.addEventListener('click', onBigScaleControlClick);
+    uploadSubmit.addEventListener('click', onUploadSubmitClick);
+    form.addEventListener('submit', onFormSubmit);
+    textHashtag.addEventListener('input', onTextHashtagInput);
     effectLevel.addEventListener('click', onEffectLevelClick);
     effectLevelPin.addEventListener('keydown', onEffectLevelPinLeftKeydown);
     effectLevelPin.addEventListener('keydown', onEffectLevelPinRightKeydown);
   };
 
-  var ontextHashtagInput = function () {
+  var onTextHashtagInput = function () {
     textHashtag.setCustomValidity('');
+    textHashtag.style = '';
   };
 
 
@@ -307,7 +308,7 @@
     }
   };
 
-  var onbigScaleControlClick = function () {
+  var onBigScaleControlClick = function () {
     var value = parseInt(scaleControlValue.value, 10);
 
     if (value < Scale.MAX) {
@@ -320,11 +321,12 @@
   // Валидируем хэштеги
   var showValidationError = function (message) {
     textHashtag.setCustomValidity(message);
-    textHashtag.style = 'border:1px solid red';
+    textHashtag.style.outline = '1px solid red';
   };
 
-  var validateHashtags = function () {
+  var onUploadSubmitClick = function () {
     var userHashtags = document.querySelector('.text__hashtags').value;
+    // textHashtag.style = '';
 
     if (userHashtags) {
       var splitHashtags = userHashtags.split(HashtagSymbol.SPLIT);
@@ -348,8 +350,6 @@
         }
         if (currentHashtag.length > Hashtag.MAX_LENGTH) {
           showValidationError(HashtagMessage.LONG);
-        } else {
-          textHashtag.style = '';
         }
       });
     }
@@ -410,10 +410,10 @@
     showErrorModal();
   };
 
-  var onUploadSubmitClick = function (evt) {
-    validateHashtags();
+  var onFormSubmit = function (evt) {
+    onUploadSubmitClick();
 
-    window.backend.upLoad(new FormData(form), onSuccsessUpload, onErrorUpload);
+    window.backend.uploadForm(new FormData(form), onSuccsessUpload, onErrorUpload);
     evt.preventDefault();
   };
 

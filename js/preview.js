@@ -16,12 +16,6 @@
   var currentPicture;
 
 
-  // Удаляем дефолтные комментарии из разметки
-  var removeComments = function () {
-    commentsList.innerHTML = '';
-  };
-
-
   // Создаём какой-нибудь элемент
   var makeElement = function (tagName, className, text) {
     var element = document.createElement(tagName);
@@ -96,7 +90,7 @@
     commentsCount.textContent = picture.comments.length;
     socialCaption.textContent = picture.description;
 
-    removeComments(); // Удаляем дефолтные комментарии из разметки
+    commentsList.innerHTML = ''; // Удаляем дефолтные комментарии из разметки
     addComments(picture);
 
     bigPicture.classList.remove('hidden');
@@ -130,11 +124,11 @@
   };
 
   var onBigPictureCloseEnterKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ENTER, closeBigPicture);
+    window.util.checkActionCode(evt, window.util.Keycode.ENTER, closeBigPicture);
   };
 
   var onBigPictureEscKeydown = function (evt) {
-    window.util.checkKeyCodeForAction(evt, window.util.Keycode.ESC, closeBigPicture);
+    window.util.checkActionCode(evt, window.util.Keycode.ESC, closeBigPicture);
   };
 
   var onSocialCommentLoadClick = function () {

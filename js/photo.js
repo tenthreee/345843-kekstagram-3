@@ -7,8 +7,8 @@
     var file = window.form.fileUpload.files[0];
     var fileName = file.name.toLowerCase();
 
-    var matches = FILE_TYPES.some(function (it) {
-      return fileName.endsWith(it);
+    var matches = FILE_TYPES.some(function (type) {
+      return fileName.endsWith(type);
     });
 
     if (matches) {
