@@ -326,7 +326,6 @@
 
   var onUploadSubmitClick = function () {
     var userHashtags = document.querySelector('.text__hashtags').value;
-    // textHashtag.style = '';
 
     if (userHashtags) {
       var splitHashtags = userHashtags.split(HashtagSymbol.SPLIT);
