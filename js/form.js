@@ -107,11 +107,9 @@
   var main = document.querySelector('main');
   var successTemplate = document.querySelector('#success');
   var success = successTemplate.content.querySelector('.success');
-  // var successButton = successTemplate.content.querySelector('.success__button');
   var errorTemplate = document.querySelector('#error');
   var error = errorTemplate.content.querySelector('.error');
-  // var errorButton = errorTemplate.content.querySelector('.error__button');
-  var modal;
+  // var modal;
   var modalButton;
   var activeEffect;
 
@@ -153,50 +151,53 @@
 
 
   // Показываем модалки
-  var showSuccessModal = function () {
+  var showModal = function (modal) {
     closeImageUpload();
-    modal = success.cloneNode(true);
-    main.appendChild(modal);
+
+    var popup = modal.cloneNode(true);
+    main.appendChild(popup);
+  };
+
+  var showSuccessModal = function () {
+    showModal(success);
 
     modalButton = document.querySelector('.success__button');
     modalButton.addEventListener('click', onSuccessButtonClick);
     modalButton.addEventListener('keydown', onSuccessButtonEnterKeydown);
     document.addEventListener('keydown', onSuccessEscKeydown);
-    document.querySelector('.success').addEventListener('click', onSuccessClick);
+    document.addEventListener('click', onSuccessClick);
   };
 
   var showErrorModal = function () {
-    closeImageUpload();
-    modal = error.cloneNode(true);
-    main.appendChild(modal);
+    showModal(error);
 
     modalButton = document.querySelector('.error__button');
     modalButton.addEventListener('click', onErrorButtonClick);
     modalButton.addEventListener('keydown', onErrorButtonEnterKeydown);
     document.addEventListener('keydown', onErrorEscKeydown);
-    document.querySelector('.error').addEventListener('click', onErrorClick);
+    document.addEventListener('click', onErrorClick);
   };
 
 
   // Закрываем модалки
   var closeSuccessModal = function () {
-    main.removeChild(main.querySelector('.success'));
-    document.removeEventListener('keydown', onSuccessEscKeydown);
+    modalButton = document.querySelector('.success__button');
+    modalButton.removeEventListener('click', onSuccessButtonClick);
+    modalButton.removeEventListener('keydown', onSuccessButtonEnterKeydown);
 
-    // modalButton = document.querySelector('.success__button');
-    // modalButton.removeEventListener('click', onSuccessButtonClick);
-    // modalButton.removeEventListener('keydown', onSuccessButtonEnterKeydown);
-    // document.querySelector('.success').removeEventListener('click', onSuccessClick);
+    main.removeChild(document.querySelector('.success'));
+    document.removeEventListener('keydown', onSuccessEscKeydown);
+    document.removeEventListener('click', onSuccessClick);
   };
 
   var closeErrorModal = function () {
+    modalButton = document.querySelector('.error__button');
+    modalButton.removeEventListener('click', onErrorButtonClick);
+    modalButton.removeEventListener('keydown', onErrorButtonEnterKeydown);
+
     main.removeChild(document.querySelector('.error'));
     document.removeEventListener('keydown', onErrorEscKeydown);
-
-    // modalButton = document.querySelector('.error__button');
-    // modalButton.removeEventListener('click', onErrorButtonClick);
-    // modalButton.removeEventListener('keydown', onErrorButtonEnterKeydown);
-    // document.querySelector('.error').removeEventListener('click', onErrorClick);
+    document.removeEventListener('click', onErrorClick);
   };
 
 
