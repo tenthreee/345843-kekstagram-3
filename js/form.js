@@ -107,10 +107,12 @@
   var main = document.querySelector('main');
   var successTemplate = document.querySelector('#success');
   var success = successTemplate.content.querySelector('.success');
-  var successButton = successTemplate.content.querySelector('.success__button');
+  // var successButton = successTemplate.content.querySelector('.success__button');
   var errorTemplate = document.querySelector('#error');
   var error = errorTemplate.content.querySelector('.error');
-  var errorButton = errorTemplate.content.querySelector('.error__button');
+  // var errorButton = errorTemplate.content.querySelector('.error__button');
+  var modal;
+  var modalButton;
   var activeEffect;
 
 
@@ -153,62 +155,81 @@
   // Показываем модалки
   var showSuccessModal = function () {
     closeImageUpload();
-    var message = success.cloneNode(true);
+    modal = success.cloneNode(true);
+    main.appendChild(modal);
 
-    main.appendChild(message);
-    successButton.addEventListener('click', onSuccessButtonClick);
-    successButton.addEventListener('keydown', onSuccessButtonEnterKeydown);
+    modalButton = document.querySelector('.success__button');
+    modalButton.addEventListener('click', onSuccessButtonClick);
+    modalButton.addEventListener('keydown', onSuccessButtonEnterKeydown);
     document.addEventListener('keydown', onSuccessEscKeydown);
     document.querySelector('.success').addEventListener('click', onSuccessClick);
   };
 
   var showErrorModal = function () {
     closeImageUpload();
-    var message = error.cloneNode(true);
+    modal = error.cloneNode(true);
+    main.appendChild(modal);
 
-    main.appendChild(message);
-    errorButton.addEventListener('click', onErrorButtonClick);
-    errorButton.addEventListener('keydown', onErrorButtonEnterKeydown);
+    modalButton = document.querySelector('.error__button');
+    modalButton.addEventListener('click', onErrorButtonClick);
+    modalButton.addEventListener('keydown', onErrorButtonEnterKeydown);
     document.addEventListener('keydown', onErrorEscKeydown);
     document.querySelector('.error').addEventListener('click', onErrorClick);
   };
 
 
   // Закрываем модалки
-  var closeModal = function (modal) {
-    main.removeChild(document.querySelector(modal));
+  var closeSuccessModal = function () {
+    main.removeChild(main.querySelector('.success'));
+    document.removeEventListener('keydown', onSuccessEscKeydown);
+
+    // modalButton = document.querySelector('.success__button');
+    // modalButton.removeEventListener('click', onSuccessButtonClick);
+    // modalButton.removeEventListener('keydown', onSuccessButtonEnterKeydown);
+    // document.querySelector('.success').removeEventListener('click', onSuccessClick);
   };
 
+  var closeErrorModal = function () {
+    main.removeChild(document.querySelector('.error'));
+    document.removeEventListener('keydown', onErrorEscKeydown);
+
+    // modalButton = document.querySelector('.error__button');
+    // modalButton.removeEventListener('click', onErrorButtonClick);
+    // modalButton.removeEventListener('keydown', onErrorButtonEnterKeydown);
+    // document.querySelector('.error').removeEventListener('click', onErrorClick);
+  };
+
+
   var onSuccessButtonClick = function () {
-    closeModal('.success');
+    closeSuccessModal();
   };
 
   var onErrorButtonClick = function () {
-    closeModal('.error');
+    closeErrorModal();
   };
 
   var onSuccessButtonEnterKeydown = function (evt) {
-    window.util.checkActionCode(evt, window.util.Keycode.ENTER, closeModal('.success'));
+    window.util.checkActionCode(evt, window.util.Keycode.ENTER, closeSuccessModal);
   };
 
   var onErrorButtonEnterKeydown = function (evt) {
-    window.util.checkActionCode(evt, window.util.Keycode.ENTER, closeModal('.error'));
+    window.util.checkActionCode(evt, window.util.Keycode.ENTER, closeErrorModal);
   };
 
   var onSuccessEscKeydown = function (evt) {
-    window.util.checkActionCode(evt, window.util.Keycode.ESC, closeModal('.success'));
+    window.util.checkActionCode(evt, window.util.Keycode.ESC, closeSuccessModal);
   };
 
   var onErrorEscKeydown = function (evt) {
-    window.util.checkActionCode(evt, window.util.Keycode.ESC, closeModal('.error'));
+    window.util.checkActionCode(evt, window.util.Keycode.ESC, closeErrorModal);
   };
 
   var onSuccessClick = function () {
-    closeModal('.success');
+    closeSuccessModal();
   };
 
   var onErrorClick = function () {
-    closeModal('.error');
+    closeErrorModal();
   };
 
 
