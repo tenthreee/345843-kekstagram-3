@@ -39,6 +39,7 @@
     avatar.width = AVATAR_SIZE;
     avatar.height = AVATAR_SIZE;
 
+    commentItem.classList.add('social__text');
     commentItem.appendChild(avatar);
     commentItem.appendChild(document.createTextNode(comment.message));
 
