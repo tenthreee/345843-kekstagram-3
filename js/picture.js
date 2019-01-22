@@ -141,6 +141,23 @@
     window.form.main.appendChild(message);
     document.querySelector('.error__inner').removeChild(document.querySelector('.error__buttons'));
     document.querySelector('.error__title').textContent = errorMessage;
+
+    document.addEventListener('keydown', onErrorEscKeydown);
+    document.addEventListener('click', onErrorClick);
+  };
+
+  var onErrorEscKeydown = function (evt) {
+    window.util.checkActionCode(evt, window.util.Keycode.ESC, closeErrorModal);
+  };
+
+  var onErrorClick = function () {
+    closeErrorModal();
+  };
+
+  var closeErrorModal = function () {
+    window.form.main.removeChild(document.querySelector('.error'));
+    document.removeEventListener('keydown', onErrorEscKeydown);
+    document.removeEventListener('click', onErrorClick);
   };
 
 
