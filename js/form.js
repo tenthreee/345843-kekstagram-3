@@ -98,6 +98,7 @@
   var imageUploadPreview = imageUpload.querySelector('.img-upload__preview');
   var imagePreview = imageUploadPreview.querySelector('img');
   var effectsList = imageUpload.querySelector('.effects__list');
+  var defaultEffect = effectsList.querySelector('#effect-none');
   var smallScaleControl = imageUpload.querySelector('.scale__control--smaller');
   var bigScaleControl = imageUpload.querySelector('.scale__control--bigger');
   var scaleControlValue = imageUpload.querySelector('.scale__control--value');
@@ -251,8 +252,7 @@
     window.photo.getUserPhoto();
     imageUpload.classList.remove('hidden');
     textDescription.maxLength = DESCRIPTION_LENGTH;
-    activeEffect = effectsList.querySelector('#effect-none');
-    activeEffect.checked = true;
+    defaultEffect.checked = true;
     resetEffect();
 
     document.addEventListener('keydown', onImageUploadEscKeydown);
@@ -271,7 +271,7 @@
 
   var onTextHashtagInput = function () {
     textHashtag.setCustomValidity('');
-    textHashtag.style = '';
+    textHashtag.style.outline = null;
   };
 
 
