@@ -83,6 +83,8 @@
     SPLIT: ' '
   };
 
+  var DESCRIPTION_LENGTH = 140;
+
   var picturesList = document.querySelector('.pictures');
   var form = picturesList.querySelector('.img-upload__form');
   var fileUpload = picturesList.querySelector('#upload-file');
@@ -226,6 +228,7 @@
   var onFileUploadChange = function () {
     window.photo.getUserPhoto();
     imageUpload.classList.remove('hidden');
+    textDescription.maxLength = DESCRIPTION_LENGTH;
     activeEffect = effectsList.querySelector('#effect-none');
     activeEffect.checked = true;
     resetEffect();
