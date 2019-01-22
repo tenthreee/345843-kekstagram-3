@@ -62,6 +62,10 @@
     commentsList.appendChild(fragment);
   };
 
+  var setSocialCommentsCount = function (currentCount, totalCount) {
+    socialCommentCount.innerHTML = currentCount + ' из <span class="comments-count">' + totalCount + '</span> комментариев';
+  };
+
   var addMoreComments = function (picture) {
     var fragment = document.createDocumentFragment();
     var addedComments = document.querySelectorAll('.social__comment');
@@ -79,7 +83,7 @@
       socialCommentLoad.classList.add('visually-hidden');
     }
 
-    socialCommentCount.innerHTML = addedCommentsCount + ' из <span class="comments-count">' + picture.comments.length + '</span> комментариев';
+    setSocialCommentsCount(addedCommentsCount, picture.comments.length);
     commentsList.appendChild(fragment);
   };
 
@@ -99,10 +103,10 @@
     body.classList.add('modal-open');
 
     if (picture.comments.length < COMMENTS_COUNT) {
-      socialCommentCount.innerHTML = picture.comments.length + ' из <span class="comments-count">' + picture.comments.length + '</span> комментариев';
+      setSocialCommentsCount(picture.comments.length, picture.comments.length);
       socialCommentLoad.classList.add('visually-hidden');
     } else {
-      socialCommentCount.innerHTML = COMMENTS_COUNT + ' из <span class="comments-count">' + picture.comments.length + '</span> комментариев';
+      setSocialCommentsCount(COMMENTS_COUNT, picture.comments.length);
       socialCommentLoad.classList.remove('visually-hidden');
       socialCommentLoad.addEventListener('click', onSocialCommentLoadClick);
     }
