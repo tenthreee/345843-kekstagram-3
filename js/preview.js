@@ -4,7 +4,8 @@
   var AVATAR_SIZE = '35';
   var COMMENTS_COUNT = 5;
 
-  var bigPicture = document.querySelector('.big-picture');
+  var body = document.querySelector('body');
+  var bigPicture = body.querySelector('.big-picture');
   var bigPictureImage = bigPicture.querySelector('img');
   var socialCaption = bigPicture.querySelector('.social__caption');
   var likesCount = bigPicture.querySelector('.likes-count');
@@ -95,6 +96,7 @@
     addComments(picture);
 
     bigPicture.classList.remove('hidden');
+    body.classList.add('modal-open');
 
     if (picture.comments.length < COMMENTS_COUNT) {
       socialCommentCount.innerHTML = picture.comments.length + ' из <span class="comments-count">' + picture.comments.length + '</span> комментариев';
@@ -113,6 +115,7 @@
 
   // Cкрываем большую фоточку
   var closeBigPicture = function () {
+    body.classList.remove('modal-open');
     bigPicture.classList.add('hidden');
     document.removeEventListener('keydown', onBigPictureEscKeydown);
     bigPictureClose.removeEventListener('click', onBigPictureCloseClick);
