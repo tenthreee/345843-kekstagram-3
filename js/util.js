@@ -56,8 +56,6 @@
 
 
   window.util = {
-    getRandomNumber: getRandomNumber,
-    swapElements: swapElements,
     shuffleArray: shuffleArray,
     searchDuplicate: searchDuplicate,
     checkActionCode: checkActionCode,
