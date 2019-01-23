@@ -24,10 +24,10 @@
 
 
   // Сортируем фотографии по количеству комментариев
-  var sortPictures = function (array) {
-    var arrayCopy = array.slice();
+  var sortPictures = function (photos) {
+    var photosCopy = photos.slice();
 
-    arrayCopy.sort(function (first, second) {
+    photosCopy.sort(function (first, second) {
       if (first.comments.length > second.comments.length) {
         return -1;
       } else if (first.comments.length < second.comments.length) {
@@ -37,7 +37,7 @@
       return 0;
     });
 
-    return arrayCopy;
+    return photosCopy;
   };
 
 
@@ -86,41 +86,44 @@
 
 
   // Показываем популярные фотографии
-  var onFilterPopularClick = window.debounce(function (evt) {
-    activateButton(evt);
-
+  var showPopularPictures = window.debounce(function (photos) {
     removePictures();
-    renderPictures(pictures);
+    renderPictures(photos);
   });
+
+  var onFilterPopularClick = function (evt) {
+    activateButton(evt);
+    showPopularPictures(pictures);
+  };
 
 
   // Показываем обсуждаемые фотографии
-  var showDiscussedPictures = function (array) {
-    var newArray = sortPictures(array);
+  var showDiscussedPictures = window.debounce(function (photos) {
+    var sortedPhotos = sortPictures(photos);
 
     removePictures();
-    renderPictures(newArray);
-  };
+    renderPictures(sortedPhotos);
+  });
 
-  var onFilterDiscussedClick = window.debounce(function (evt) {
+  var onFilterDiscussedClick = function (evt) {
     activateButton(evt);
     showDiscussedPictures(pictures);
-  });
+  };
 
 
   // Показываем новые фотографии
-  var showNewPictures = function (photos) {
-    var newArray = photos.slice();
-    window.util.shuffleArray(newArray);
+  var showNewPictures = window.debounce(function (photos) {
+    var newPhotos = photos.slice();
+    window.util.shuffleArray(newPhotos);
 
     removePictures();
-    renderPictures(newArray.slice(0, NEW_PICTURES_COUNT));
-  };
+    renderPictures(newPhotos.slice(0, NEW_PICTURES_COUNT));
+  });
 
-  var onFilterNewClick = window.debounce(function (evt) {
+  var onFilterNewClick = function (evt) {
     activateButton(evt);
     showNewPictures(pictures);
-  });
+  };
 
 
   // Успешное выполнение запроса
@@ -169,4 +172,9 @@
   filterPopular.addEventListener('click', onFilterPopularClick);
   filterNew.addEventListener('click', onFilterNewClick);
   filterDiscussed.addEventListener('click', onFilterDiscussedClick);
+
+  window.picture = {
+    onErrorDownload: onErrorDownload
+  };
+
 })();

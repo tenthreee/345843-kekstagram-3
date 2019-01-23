@@ -26,7 +26,7 @@
 
     CHROME: {
       id: 'effect-chrome',
-      name: 'chrome',
+      class: 'effects__preview--chrome',
       filter: 'grayscale',
       min: 0,
       max: 1,
@@ -35,7 +35,7 @@
 
     SEPIA: {
       id: 'effect-sepia',
-      name: 'sepia',
+      class: 'effects__preview--sepia',
       filter: 'sepia',
       min: 0,
       max: 1,
@@ -44,7 +44,7 @@
 
     MARVIN: {
       id: 'effect-marvin',
-      name: 'marvin',
+      class: 'effects__preview--marvin',
       filter: 'invert',
       min: 0,
       max: 100,
@@ -53,7 +53,7 @@
 
     PHOBOS: {
       id: 'effect-phobos',
-      name: 'phobos',
+      class: 'effects__preview--phobos',
       filter: 'blur',
       min: 0,
       max: 3,
@@ -62,7 +62,7 @@
 
     HEAT: {
       id: 'effect-heat',
-      name: 'heat',
+      class: 'effects__preview--heat',
       filter: 'brightness',
       min: 1,
       max: 3,
@@ -71,11 +71,12 @@
   };
 
   var HashtagMessage = {
-    TOO_MANY: 'Нельзя указать больше пяти хэш-тегов',
-    SAME: 'Один и тот же хэш-тег не может быть использован дважды',
-    NOT_HASH: 'Хэш-тег должен начинаться с символа #',
-    SHORT: 'Хэш-тег не может состоять только из одного символа',
-    LONG: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку'
+    TOO_MANY: 'Нельзя указать больше пяти хэш-тегов ',
+    NO_SPACE: 'Хэш-теги должны разделяться пробелом ',
+    SAME: 'Один и тот же хэш-тег не может быть использован дважды ',
+    NOT_HASH: 'Хэш-тег должен начинаться с символа # ',
+    SHORT: 'Хэш-тег не может состоять только из одного символа ',
+    LONG: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку '
   };
 
   var HashtagSymbol = {
@@ -110,7 +111,6 @@
   var success = successTemplate.content.querySelector('.success');
   var errorTemplate = document.querySelector('#error');
   var error = errorTemplate.content.querySelector('.error');
-  // var modal;
   var modalButton;
   var activeEffect;
 
@@ -121,6 +121,7 @@
 
     if (focused !== textDescription && focused !== textHashtag) {
       imageUpload.classList.add('hidden');
+      textHashtag.style.outline = null;
       form.reset();
 
       document.removeEventListener('keydown', onImageUploadEscKeydown);
@@ -237,8 +238,8 @@
 
   // Сбрасываем эффект
   var resetEffect = function () {
-    imagePreview.style = '';
-    imagePreview.className = '';
+    imagePreview.style.filter = null;
+    imagePreview.style.transform = null;
     effectLevelDepth.style.width = '100%';
     effectLevelPin.style.left = '100%';
     effectLevelValue.value = '100';
@@ -249,8 +250,9 @@
 
   // Открываем форму редактирования изображения
   var onFileUploadChange = function () {
-    window.photo.getUserPhoto();
     imageUpload.classList.remove('hidden');
+
+    window.photo.read();
     textDescription.maxLength = DESCRIPTION_LENGTH;
     defaultEffect.checked = true;
     resetEffect();
@@ -276,8 +278,8 @@
 
 
   // Применяем эффект к фоточке
-  var getEffect = function () {
-    activeEffect = effectsList.querySelector('input[type=radio]:checked');
+  var getEffect = function (evt) {
+    activeEffect = evt.target;
 
     switch (activeEffect.id) {
       case Effect.CHROME.id:
@@ -295,20 +297,24 @@
     }
   };
 
-  var setEffect = function () {
+  var setEffect = function (evt) {
     resetEffect();
 
-    var effect = getEffect();
+    if (activeEffect) {
+      imagePreview.classList.remove(activeEffect.class);
+    }
 
-    if (effect !== '') {
+    activeEffect = getEffect(evt);
+
+    if (activeEffect !== '') {
       effectLevel.classList.remove('hidden');
-      imagePreview.classList.add('effects__preview--' + effect.name);
-      setFilterValue(effect, effect.max);
+      imagePreview.classList.add(activeEffect.class);
+      setFilterValue(activeEffect, activeEffect.max);
     }
   };
 
-  var onEffecstListClick = function () {
-    setEffect();
+  var onEffecstListClick = function (evt) {
+    setEffect(evt);
   };
 
 
@@ -351,31 +357,40 @@
 
   var onUploadSubmitClick = function () {
     var userHashtags = document.querySelector('.text__hashtags').value;
+    var errorMessage = '';
 
     if (userHashtags) {
       var splitHashtags = userHashtags.split(HashtagSymbol.SPLIT);
 
       if (splitHashtags.length > Hashtag.MAX_NUMBER) {
-        showValidationError(HashtagMessage.TOO_MANY);
+        errorMessage += HashtagMessage.TOO_MANY;
       }
 
       splitHashtags.forEach(function (elem) {
         var currentHashtag = elem.toLowerCase();
+        var hashtagSymbols = currentHashtag.split('');
         var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
+        var sharpCount = window.util.searchDuplicate(HashtagSymbol.START, hashtagSymbols);
+
+        if (sharpCount > 1) {
+          errorMessage += HashtagMessage.NO_SPACE;
+        }
 
         if (sameHashtags > 1) {
-          showValidationError(HashtagMessage.SAME);
+          errorMessage += HashtagMessage.SAME;
         }
         if (currentHashtag[0] !== HashtagSymbol.START) {
-          showValidationError(HashtagMessage.NOT_HASH);
+          errorMessage += HashtagMessage.NOT_HASH;
         }
         if (currentHashtag.length < Hashtag.MIN_LENGTH) {
-          showValidationError(HashtagMessage.SHORT);
+          errorMessage += HashtagMessage.SHORT;
         }
         if (currentHashtag.length > Hashtag.MAX_LENGTH) {
-          showValidationError(HashtagMessage.LONG);
+          errorMessage += HashtagMessage.LONG;
         }
       });
+
+      showValidationError(errorMessage);
     }
   };
 
@@ -480,6 +495,7 @@
   fileUpload.addEventListener('change', onFileUploadChange);
 
   window.form = {
+    closeImageUpload: closeImageUpload,
     fileUpload: fileUpload,
     imagePreview: imagePreview,
     error: error,

@@ -3,7 +3,7 @@
 (function () {
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
 
-  var getUserPhoto = function () {
+  var read = function () {
     var file = window.form.fileUpload.files[0];
     var fileName = file.name.toLowerCase();
 
@@ -19,11 +19,14 @@
       });
 
       reader.readAsDataURL(file);
+    } else {
+      window.form.closeImageUpload();
+      window.picture.onErrorDownload('Неверный тип файла');
     }
   };
 
   window.photo = {
-    getUserPhoto: getUserPhoto
+    read: read
   };
 
 })();
