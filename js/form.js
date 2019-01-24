@@ -432,7 +432,6 @@
     effectLevelPin.style.left = value + '%';
     effectLevelDepth.style.width = value + '%';
 
-    activeEffect = getEffect();
     var filterValue = activeEffect.min + (value / EffectValue.MAX) * (activeEffect.max - activeEffect.min);
 
     effectLevelValue.value = value;
@@ -496,8 +495,8 @@
 
   window.form = {
     closeImageUpload: closeImageUpload,
-    fileUpload: fileUpload,
-    imagePreview: imagePreview,
+    // fileUpload: fileUpload,
+    // imagePreview: imagePreview,
     error: error,
     main: main
   };
