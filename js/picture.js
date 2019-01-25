@@ -75,11 +75,8 @@
 
   // Показываем, какой фильтр выбран
   var activateButton = function (evt) {
-    document.querySelectorAll('.img-filters__button').forEach(function (elem) {
-      if (elem.classList.contains('img-filters__button--active')) {
-        elem.classList.remove('img-filters__button--active');
-      }
-    });
+    var activeButton = document.querySelector('.img-filters__button--active');
+    activeButton.classList.toggle('img-filters__button--active');
 
     evt.target.classList.add('img-filters__button--active');
   };
