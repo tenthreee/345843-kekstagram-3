@@ -51,9 +51,8 @@
   // Добавляем комментарий в разметку
   var addComments = function (picture) {
     var fragment = document.createDocumentFragment();
-    var comments = picture.comments.length > COMMENTS_COUNT ?
-      picture.comments.slice(0, COMMENTS_COUNT) :
-      picture.comments.slice();
+    var commentsRenderCount = picture.comments.length > COMMENTS_COUNT ? COMMENTS_COUNT : picture.comments.length;
+    var comments = picture.comments.slice(0, commentsRenderCount);
 
     comments.forEach(function (comment) {
       fragment.appendChild(createComment(comment));
@@ -69,10 +68,12 @@
   var addMoreComments = function (picture) {
     var fragment = document.createDocumentFragment();
     var addedComments = document.querySelectorAll('.social__comment');
-    var commentsCountToRender = picture.comments.length - addedComments.length;
-    var comments = commentsCountToRender >= COMMENTS_COUNT ?
-      picture.comments.slice(addedComments.length, addedComments.length + COMMENTS_COUNT) :
-      picture.comments.slice(addedComments.length);
+
+    var commentsRenderCount = picture.comments.length - addedComments.length >= COMMENTS_COUNT ?
+      addedComments.length + COMMENTS_COUNT :
+      picture.comments.length;
+
+    var comments = picture.comments.slice(addedComments.length, commentsRenderCount);
     var addedCommentsCount = addedComments.length + comments.length;
 
     comments.forEach(function (comment) {

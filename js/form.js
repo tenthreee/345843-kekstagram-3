@@ -357,10 +357,11 @@
 
   var onUploadSubmitClick = function () {
     var userHashtags = document.querySelector('.text__hashtags').value;
-    var errorMessage = '';
 
     if (userHashtags) {
       var splitHashtags = userHashtags.split(HashtagSymbol.SPLIT);
+      var errorMessage = '';
+      var isHashtagDuplicated = false;
 
       if (splitHashtags.length > Hashtag.MAX_NUMBER) {
         errorMessage += HashtagMessage.TOO_MANY;
@@ -375,9 +376,8 @@
         if (sharpCount > 1) {
           errorMessage += HashtagMessage.NO_SPACE;
         }
-
         if (sameHashtags > 1) {
-          errorMessage += HashtagMessage.SAME;
+          isHashtagDuplicated = true;
         }
         if (currentHashtag[0] !== HashtagSymbol.START) {
           errorMessage += HashtagMessage.NOT_HASH;
@@ -389,6 +389,10 @@
           errorMessage += HashtagMessage.LONG;
         }
       });
+
+      if (isHashtagDuplicated) {
+        errorMessage += HashtagMessage.SAME;
+      }
 
       showValidationError(errorMessage);
     }
@@ -495,8 +499,6 @@
 
   window.form = {
     closeImageUpload: closeImageUpload,
-    // fileUpload: fileUpload,
-    // imagePreview: imagePreview,
     error: error,
     main: main
   };
