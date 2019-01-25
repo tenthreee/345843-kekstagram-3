@@ -37,19 +37,14 @@
   var searchDuplicate = function (element, array) {
     var duplicate = 0;
 
-    // while (duplicate < 2) {
-    //   for (var i = 0; i < array.length; i++) {
-    //     if (array[i] === element) {
-    //       duplicate += 1;
-    //     }
-    //   }
-    // }
-
-    array.forEach(function (elem) {
-      if (elem === element) {
+    for (var i = 0; i < array.length; i++) {
+      if (duplicate > 1) {
+        break;
+      }
+      if (array[i] === element) {
         duplicate += 1;
       }
-    });
+    }
 
     return duplicate;
   };
