@@ -136,11 +136,18 @@
       effectLevel.removeEventListener('click', onEffectLevelClick);
       effectLevelPin.removeEventListener('keydown', onEffectLevelPinLeftKeydown);
       effectLevelPin.removeEventListener('keydown', onEffectLevelPinRightKeydown);
+      textHashtag.removeEventListener('keydown', onTextHashtagEnterKeydown);
     }
   };
 
   var onUploadCancelClick = function () {
     closeImageUpload();
+  };
+
+  var onTextHashtagEnterKeydown = function (evt) {
+    if (evt.keyCode === window.util.Keycode.ENTER) {
+      evt.preventDefault();
+    }
   };
 
   var onUploadCancelKeydown = function (evt) {
@@ -238,6 +245,10 @@
 
   // Сбрасываем эффект
   var resetEffect = function () {
+    if (activeEffect) {
+      imagePreview.classList.remove(activeEffect.class);
+    }
+
     imagePreview.style.filter = null;
     imagePreview.style.transform = null;
     effectLevelDepth.style.width = '100%';
@@ -269,6 +280,7 @@
     effectLevel.addEventListener('click', onEffectLevelClick);
     effectLevelPin.addEventListener('keydown', onEffectLevelPinLeftKeydown);
     effectLevelPin.addEventListener('keydown', onEffectLevelPinRightKeydown);
+    textHashtag.addEventListener('keydown', onTextHashtagEnterKeydown);
   };
 
   var onTextHashtagInput = function () {
@@ -299,10 +311,6 @@
 
   var setEffect = function (evt) {
     resetEffect();
-
-    if (activeEffect) {
-      imagePreview.classList.remove(activeEffect.class);
-    }
 
     activeEffect = getEffect(evt);
 
@@ -356,7 +364,7 @@
   };
 
   var onUploadSubmitClick = function () {
-    var userHashtags = document.querySelector('.text__hashtags').value;
+    var userHashtags = document.querySelector('.text__hashtags').value.toLowerCase().replace(/\s+/g, ' ');
 
     if (userHashtags) {
       var splitHashtags = userHashtags.split(HashtagSymbol.SPLIT);
@@ -368,9 +376,8 @@
       }
 
       splitHashtags.forEach(function (elem) {
-        var currentHashtag = elem.toLowerCase();
-        var hashtagSymbols = currentHashtag.split('');
-        var sameHashtags = window.util.searchDuplicate(currentHashtag, splitHashtags);
+        var hashtagSymbols = elem.trim().split('');
+        var sameHashtags = window.util.searchDuplicate(elem, splitHashtags);
         var sharpCount = window.util.searchDuplicate(HashtagSymbol.START, hashtagSymbols);
 
         if (sharpCount > 1) {
@@ -379,13 +386,13 @@
         if (sameHashtags > 1) {
           isHashtagDuplicated = true;
         }
-        if (currentHashtag[0] !== HashtagSymbol.START) {
+        if (elem[0] !== HashtagSymbol.START) {
           errorMessage += HashtagMessage.NOT_HASH;
         }
-        if (currentHashtag.length < Hashtag.MIN_LENGTH) {
+        if (elem.length < Hashtag.MIN_LENGTH) {
           errorMessage += HashtagMessage.SHORT;
         }
-        if (currentHashtag.length > Hashtag.MAX_LENGTH) {
+        if (elem.length > Hashtag.MAX_LENGTH) {
           errorMessage += HashtagMessage.LONG;
         }
       });
