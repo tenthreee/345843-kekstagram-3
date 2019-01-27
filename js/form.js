@@ -71,12 +71,12 @@
   };
 
   var HashtagMessage = {
-    TOO_MANY: 'Нельзя указать больше пяти хэш-тегов ',
-    NO_SPACE: 'Хэш-теги должны разделяться пробелом ',
-    SAME: 'Один и тот же хэш-тег не может быть использован дважды ',
-    NOT_HASH: 'Хэш-тег должен начинаться с символа # ',
-    SHORT: 'Хэш-тег не может состоять только из одного символа ',
-    LONG: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку '
+    TOO_MANY: 'Нельзя указать больше пяти хэш-тегов. ',
+    NO_SPACE: 'Хэш-теги должны разделяться пробелом. ',
+    SAME: 'Один и тот же хэш-тег не может быть использован дважды. ',
+    NOT_HASH: 'Хэш-тег должен начинаться с символа #. ',
+    SHORT: 'Хэш-тег не может состоять только из одного символа. ',
+    LONG: 'Максимальная длина одного хэш-тега — 20 символов, включая решётку. '
   };
 
   var HashtagSymbol = {
@@ -364,7 +364,7 @@
   };
 
   var onUploadSubmitClick = function () {
-    var userHashtags = document.querySelector('.text__hashtags').value.toLowerCase().replace(/\s+/g, ' ');
+    var userHashtags = document.querySelector('.text__hashtags').value.toLowerCase().replace(/\s+/g, ' ').trim();
 
     if (userHashtags) {
       var splitHashtags = userHashtags.split(HashtagSymbol.SPLIT);
