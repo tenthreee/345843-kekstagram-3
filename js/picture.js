@@ -7,9 +7,10 @@
   var template = document.querySelector('#picture');
   var pictureTemplate = template.content.querySelector('.picture');
   var imageFilter = document.querySelector('.img-filters');
-  var filterPopular = imageFilter.querySelector('#filter-popular');
-  var filterNew = imageFilter.querySelector('#filter-new');
-  var filterDiscussed = imageFilter.querySelector('#filter-discussed');
+  var imageFiltersForm = document.querySelector('.img-filters__form');
+  // var filterPopular = imageFilter.querySelector('#filter-popular');
+  // var filterNew = imageFilter.querySelector('#filter-new');
+  // var filterDiscussed = imageFilter.querySelector('#filter-discussed');
   var pictures = [];
 
 
@@ -83,43 +84,64 @@
 
 
   // Показываем популярные фотографии
-  var showPopularPictures = window.debounce(function (photos) {
+  var showPopularPictures = function (photos) {
     removePictures();
     renderPictures(photos);
-  });
-
-  var onFilterPopularClick = function (evt) {
-    activateButton(evt);
-    showPopularPictures(pictures);
   };
+
+  // var onFilterPopularClick = function (evt) {
+  //   activateButton(evt);
+  //   showPopularPictures(pictures);
+  // };
 
 
   // Показываем обсуждаемые фотографии
-  var showDiscussedPictures = window.debounce(function (photos) {
+  var showDiscussedPictures = function (photos) {
     var sortedPhotos = sortPictures(photos);
 
     removePictures();
     renderPictures(sortedPhotos);
-  });
-
-  var onFilterDiscussedClick = function (evt) {
-    activateButton(evt);
-    showDiscussedPictures(pictures);
   };
+
+  // var onFilterDiscussedClick = function (evt) {
+  //   activateButton(evt);
+  //   showDiscussedPictures(pictures);
+  // };
 
 
   // Показываем новые фотографии
-  var showNewPictures = window.debounce(function (photos) {
+  var showNewPictures = function (photos) {
     var newPhotos = photos.slice();
     window.util.shuffleArray(newPhotos);
 
     removePictures();
     renderPictures(newPhotos.slice(0, NEW_PICTURES_COUNT));
+  };
+
+  // var onFilterNewClick = function (evt) {
+  //   activateButton(evt);
+  //   showNewPictures(pictures);
+  // };
+
+  var switchFilter = window.debounce(function (effect) {
+    switch (effect.id) {
+      case 'filter-popular':
+        showPopularPictures(pictures);
+        break;
+      case 'filter-new':
+        showNewPictures(pictures);
+        break;
+      case 'filter-discussed':
+        showDiscussedPictures(pictures);
+        break;
+      default:
+        break;
+    }
   });
 
-  var onFilterNewClick = function (evt) {
+  var onImageFiltersFormClick = function (evt) {
     activateButton(evt);
-    showNewPictures(pictures);
+    switchFilter(evt.target);
   };
 
 
@@ -166,9 +188,10 @@
 
 
   // Обработчки кликов по кнопкам сортировки
-  filterPopular.addEventListener('click', onFilterPopularClick);
-  filterNew.addEventListener('click', onFilterNewClick);
-  filterDiscussed.addEventListener('click', onFilterDiscussedClick);
+  imageFiltersForm.addEventListener('click', onImageFiltersFormClick);
+  // filterPopular.addEventListener('click', onFilterPopularClick);
+  // filterNew.addEventListener('click', onFilterNewClick);
+  // filterDiscussed.addEventListener('click', onFilterDiscussedClick);
 
   window.picture = {
     onErrorDownload: onErrorDownload
