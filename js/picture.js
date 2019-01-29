@@ -1,6 +1,12 @@
 'use strict';
 
 (function () {
+  var Filter = {
+    POPULAR: 'filter-popular',
+    NEW: 'filter-new',
+    DISCUSSED: 'filter-discussed'
+  };
+
   var NEW_PICTURES_COUNT = 10;
 
   var picturesList = document.querySelector('.pictures');
@@ -8,9 +14,6 @@
   var pictureTemplate = template.content.querySelector('.picture');
   var imageFilter = document.querySelector('.img-filters');
   var imageFiltersForm = document.querySelector('.img-filters__form');
-  // var filterPopular = imageFilter.querySelector('#filter-popular');
-  // var filterNew = imageFilter.querySelector('#filter-new');
-  // var filterDiscussed = imageFilter.querySelector('#filter-discussed');
   var pictures = [];
 
 
@@ -89,11 +92,6 @@
     renderPictures(photos);
   };
 
-  // var onFilterPopularClick = function (evt) {
-  //   activateButton(evt);
-  //   showPopularPictures(pictures);
-  // };
-
 
   // Показываем обсуждаемые фотографии
   var showDiscussedPictures = function (photos) {
@@ -102,11 +100,6 @@
     removePictures();
     renderPictures(sortedPhotos);
   };
-
-  // var onFilterDiscussedClick = function (evt) {
-  //   activateButton(evt);
-  //   showDiscussedPictures(pictures);
-  // };
 
 
   // Показываем новые фотографии
@@ -118,20 +111,17 @@
     renderPictures(newPhotos.slice(0, NEW_PICTURES_COUNT));
   };
 
-  // var onFilterNewClick = function (evt) {
-  //   activateButton(evt);
-  //   showNewPictures(pictures);
-  // };
 
+  // Переключаем фильтры
   var switchFilter = window.debounce(function (effect) {
     switch (effect.id) {
-      case 'filter-popular':
+      case Filter.POPULAR:
         showPopularPictures(pictures);
         break;
-      case 'filter-new':
+      case Filter.NEW:
         showNewPictures(pictures);
         break;
-      case 'filter-discussed':
+      case Filter.DISCUSSED:
         showDiscussedPictures(pictures);
         break;
       default:
@@ -189,9 +179,6 @@
 
   // Обработчки кликов по кнопкам сортировки
   imageFiltersForm.addEventListener('click', onImageFiltersFormClick);
-  // filterPopular.addEventListener('click', onFilterPopularClick);
-  // filterNew.addEventListener('click', onFilterNewClick);
-  // filterDiscussed.addEventListener('click', onFilterDiscussedClick);
 
   window.picture = {
     onErrorDownload: onErrorDownload

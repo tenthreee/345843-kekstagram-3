@@ -351,10 +351,10 @@
   };
 
   var onUploadSubmitClick = function () {
-    var userHashtags = document.querySelector('.text__hashtags').value.toLowerCase().replace(/\s+/g, ' ').trim();
+    var userHashtag = document.querySelector('.text__hashtags').value.toLowerCase().replace(/\s+/g, ' ').trim();
 
-    if (userHashtags) {
-      var splitHashtags = userHashtags.split(HashtagSymbol.SPLIT);
+    if (userHashtag) {
+      var splitHashtags = userHashtag.split(HashtagSymbol.SPLIT);
       var errorMessage = '';
       var isHashtagDuplicated = false;
 
@@ -364,13 +364,13 @@
 
       splitHashtags.forEach(function (elem) {
         var hashtagSymbols = elem.trim().split('');
-        var sameHashtags = window.util.searchDuplicate(elem, splitHashtags);
+        var sameHashtagCount = window.util.searchDuplicate(elem, splitHashtags);
         var sharpCount = window.util.searchDuplicate(HashtagSymbol.START, hashtagSymbols);
 
         if (sharpCount > 1) {
           errorMessage += HashtagMessage.NO_SPACE;
         }
-        if (sameHashtags > 1) {
+        if (sameHashtagCount > 1) {
           isHashtagDuplicated = true;
         }
         if (elem[0] !== HashtagSymbol.START) {

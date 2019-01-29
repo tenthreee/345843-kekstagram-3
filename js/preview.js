@@ -51,7 +51,11 @@
   // Добавляем комментарий в разметку
   var addComments = function (picture) {
     var fragment = document.createDocumentFragment();
-    var commentsRenderCount = picture.comments.length > COMMENTS_COUNT ? COMMENTS_COUNT : picture.comments.length;
+
+    var commentsRenderCount = picture.comments.length > COMMENTS_COUNT ?
+      COMMENTS_COUNT :
+      picture.comments.length;
+
     var comments = picture.comments.slice(0, commentsRenderCount);
 
     comments.forEach(function (comment) {
