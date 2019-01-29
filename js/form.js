@@ -388,7 +388,9 @@
         errorMessage += HashtagMessage.SAME;
       }
 
-      showValidationError(errorMessage);
+      if (errorMessage !== '') {
+        showValidationError(errorMessage);
+      }
     }
   };
 
