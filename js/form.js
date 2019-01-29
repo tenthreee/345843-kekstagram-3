@@ -107,47 +107,37 @@
   var textHashtag = imageUpload.querySelector('.text__hashtags');
   var uploadSubmit = imageUpload.querySelector('#upload-submit');
   var main = document.querySelector('main');
-  var successTemplate = document.querySelector('#success');
-  var success = successTemplate.content.querySelector('.success');
-  var errorTemplate = document.querySelector('#error');
-  var error = errorTemplate.content.querySelector('.error');
-  var modalButton;
+  var successTemplate = document.querySelector('#success').content.querySelector('.success');
+  var success = successTemplate.cloneNode(true);
+  var successButton = success.querySelector('.success__button');
+  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
+  var error = errorTemplate.cloneNode(true);
+  var errorButton = error.querySelector('.error__button');
   var activeEffect;
 
 
   // Закрываем форму редактирования изображения
   var closeImageUpload = function () {
-    var focused = document.activeElement;
+    imageUpload.classList.add('hidden');
+    textHashtag.style.outline = null;
+    form.reset();
 
-    if (focused !== textDescription && focused !== textHashtag) {
-      imageUpload.classList.add('hidden');
-      textHashtag.style.outline = null;
-      form.reset();
-
-      document.removeEventListener('keydown', onImageUploadEscKeydown);
-      uploadCancel.removeEventListener('click', onUploadCancelClick);
-      uploadCancel.removeEventListener('keydown', onUploadCancelKeydown);
-      effectsList.removeEventListener('click', onEffecstListClick);
-      smallScaleControl.removeEventListener('click', onSmallScaleControlClick);
-      bigScaleControl.removeEventListener('click', onBigScaleControlClick);
-      uploadSubmit.removeEventListener('click', onUploadSubmitClick);
-      form.removeEventListener('submit', onFormSubmit);
-      textHashtag.removeEventListener('input', onTextHashtagInput);
-      effectLevel.removeEventListener('click', onEffectLevelClick);
-      effectLevelPin.removeEventListener('keydown', onEffectLevelPinLeftKeydown);
-      effectLevelPin.removeEventListener('keydown', onEffectLevelPinRightKeydown);
-      textHashtag.removeEventListener('keydown', onTextHashtagEnterKeydown);
-    }
+    document.removeEventListener('keydown', onImageUploadEscKeydown);
+    uploadCancel.removeEventListener('click', onUploadCancelClick);
+    uploadCancel.removeEventListener('keydown', onUploadCancelKeydown);
+    effectsList.removeEventListener('click', onEffecstListClick);
+    smallScaleControl.removeEventListener('click', onSmallScaleControlClick);
+    bigScaleControl.removeEventListener('click', onBigScaleControlClick);
+    uploadSubmit.removeEventListener('click', onUploadSubmitClick);
+    form.removeEventListener('submit', onFormSubmit);
+    textHashtag.removeEventListener('input', onTextHashtagInput);
+    effectLevel.removeEventListener('click', onEffectLevelClick);
+    effectLevelPin.removeEventListener('keydown', onEffectLevelPinLeftKeydown);
+    effectLevelPin.removeEventListener('keydown', onEffectLevelPinRightKeydown);
   };
 
   var onUploadCancelClick = function () {
     closeImageUpload();
-  };
-
-  var onTextHashtagEnterKeydown = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ENTER) {
-      evt.preventDefault();
-    }
   };
 
   var onUploadCancelKeydown = function (evt) {
@@ -155,24 +145,25 @@
   };
 
   var onImageUploadEscKeydown = function (evt) {
-    window.util.checkActionCode(evt, window.util.Keycode.ESC, closeImageUpload);
+    var focused = document.activeElement;
+
+    if (focused !== textDescription && focused !== textHashtag) {
+      window.util.checkActionCode(evt, window.util.Keycode.ESC, closeImageUpload);
+    }
   };
 
 
   // Показываем модалки
   var showModal = function (modal) {
     closeImageUpload();
-
-    var popup = modal.cloneNode(true);
-    main.appendChild(popup);
+    main.appendChild(modal);
   };
 
   var showSuccessModal = function () {
     showModal(success);
 
-    modalButton = document.querySelector('.success__button');
-    modalButton.addEventListener('click', onSuccessButtonClick);
-    modalButton.addEventListener('keydown', onSuccessButtonEnterKeydown);
+    successButton.addEventListener('click', onSuccessButtonClick);
+    successButton.addEventListener('keydown', onSuccessButtonEnterKeydown);
     document.addEventListener('keydown', onSuccessEscKeydown);
     document.addEventListener('click', onSuccessClick);
   };
@@ -180,9 +171,8 @@
   var showErrorModal = function () {
     showModal(error);
 
-    modalButton = document.querySelector('.error__button');
-    modalButton.addEventListener('click', onErrorButtonClick);
-    modalButton.addEventListener('keydown', onErrorButtonEnterKeydown);
+    errorButton.addEventListener('click', onErrorButtonClick);
+    errorButton.addEventListener('keydown', onErrorButtonEnterKeydown);
     document.addEventListener('keydown', onErrorEscKeydown);
     document.addEventListener('click', onErrorClick);
   };
@@ -190,21 +180,19 @@
 
   // Закрываем модалки
   var closeSuccessModal = function () {
-    modalButton = document.querySelector('.success__button');
-    modalButton.removeEventListener('click', onSuccessButtonClick);
-    modalButton.removeEventListener('keydown', onSuccessButtonEnterKeydown);
+    successButton.removeEventListener('click', onSuccessButtonClick);
+    successButton.removeEventListener('keydown', onSuccessButtonEnterKeydown);
 
-    main.removeChild(document.querySelector('.success'));
+    main.removeChild(success);
     document.removeEventListener('keydown', onSuccessEscKeydown);
     document.removeEventListener('click', onSuccessClick);
   };
 
   var closeErrorModal = function () {
-    modalButton = document.querySelector('.error__button');
-    modalButton.removeEventListener('click', onErrorButtonClick);
-    modalButton.removeEventListener('keydown', onErrorButtonEnterKeydown);
+    errorButton.removeEventListener('click', onErrorButtonClick);
+    errorButton.removeEventListener('keydown', onErrorButtonEnterKeydown);
 
-    main.removeChild(document.querySelector('.error'));
+    main.removeChild(error);
     document.removeEventListener('keydown', onErrorEscKeydown);
     document.removeEventListener('click', onErrorClick);
   };
@@ -280,7 +268,6 @@
     effectLevel.addEventListener('click', onEffectLevelClick);
     effectLevelPin.addEventListener('keydown', onEffectLevelPinLeftKeydown);
     effectLevelPin.addEventListener('keydown', onEffectLevelPinRightKeydown);
-    textHashtag.addEventListener('keydown', onTextHashtagEnterKeydown);
   };
 
   var onTextHashtagInput = function () {
@@ -460,8 +447,6 @@
   };
 
   var onFormSubmit = function (evt) {
-    onUploadSubmitClick();
-
     window.backend.uploadForm(new FormData(form), onSuccsessUpload, onErrorUpload);
     evt.preventDefault();
   };
